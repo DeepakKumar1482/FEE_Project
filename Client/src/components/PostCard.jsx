@@ -30,7 +30,7 @@ function PostCard() {
     },[postData])
 
   return (
-    <div className='flex flex-col gap-2 w-[28rem]  px-5 py-8 rounded-xl justify-evenly min-h-screen'>
+    <div className='flex flex-col gap-2 w-[28rem] px-5 py-8 rounded-xl justify-evenly min-h-screen'>
         <div className='flex gap-2 items-center'>
             <div>
                 {/* <img src={postData.avatar} alt="" /> */}
