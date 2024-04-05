@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { SideBar } from './components'
+import { PostCard, SideBar } from './components'
 import Signup from './pages/Signup'
 function App() {
   return (
@@ -8,6 +8,7 @@ function App() {
       <Route element={<SideBar />} path='/'/>
       <Route element={<Signup  />} path='/:signup'/>
       <Route element={<Signup  />} path='/:signin'/>
+      <Route element={<PostCard  />} path='/postcard'/>
     </Routes>
     </BrowserRouter>
   )
