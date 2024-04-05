@@ -9,7 +9,10 @@ export default {
     extend: {
       transitionProperty: {
         'bg-color': 'background-color'
-      }
+      },
+      fontFamily:{
+        'proxima-nova': ['Proxima Nova', 'sans-serif'],
+      },
     },
   },
   plugins: [],

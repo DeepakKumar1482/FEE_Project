@@ -1,10 +1,11 @@
-import { SideBar } from './components'
+import { SideBar, PostCard } from './components'
 
 function App() {
   return (
-    <>
-      <SideBar/>
-    </>
+    <div className='flex flex-col items-center'> 
+      <PostCard/>
+      <PostCard/>
+    </div>
   )
 }
 
