@@ -7,7 +7,7 @@ import Google from '../assets/Google.webp'
 import {useParams} from 'react-router-dom'
 const Signup = () => {
     const param = useParams();
-    const [params,setparams]=useState(param.signup)
+    const [params,setparams]=useState(param.signup);
     const googleauthProvider=new GoogleAuthProvider();
     const db= getAuth(app);
     const navigate = useNavigate();
@@ -25,7 +25,7 @@ const Signup = () => {
     };
     const signupWithGoogle=()=>{
         signInWithPopup(db,googleauthProvider).then(()=>{
-          message.success("Successfully Signedup"); 
+          message.success("Successfully Signedup");
           navigate('/');
         }).catch(()=>{
             message.error("Wrong Credentials");
@@ -52,7 +52,6 @@ const Signup = () => {
                         <Input placeholder='Password' />
                     </Form.Item>
                     <button type='submit' className='w-full h-11 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4'>
-                        {/* Signup with mail */}
                         {params==='signup' ? 'Signup with mail' : 'Signin with mail'}
                     </button>
                 </Form>
