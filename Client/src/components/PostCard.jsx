@@ -50,7 +50,7 @@ function PostCard() {
 
         <div className='flex hide-scrollbar gap-2 overflow-x-scroll'>
             {postData.techStack.map((tech) => (
-                <div className='flex items-center gap-1 dark:text-white bg-gray-200 dark:bg-gray-700 rounded-md px-2 py-1 min-w-fit'>
+                <div key={tech} className='flex items-center gap-1 dark:text-white bg-gray-200 dark:bg-gray-700 rounded-md px-2 py-1 min-w-fit'>
                     <div className='bg-green-600 w-2 h-2 rounded'></div>
                     <p>{tech}</p>
                 </div>
@@ -58,7 +58,7 @@ function PostCard() {
         </div> {/* tech stack */}
 
         <div  className='dark:text-white text-gray-800 '>
-            <p ref={myRef} className='h-[4.5rem] overflow-y-hidden' onc>{postData.caption}</p>
+            <p ref={myRef} className='h-[4.5rem] overflow-y-hidden' >{postData.caption}</p>
             {isOpen? <div onClick={() => setIsModalPostOpen(true)} className='cursor-pointer text-indigo-400 hover:text-indigo-500 active:text-indigo-600'>view more...</div> : null}
         </div> {/* caption */}
 

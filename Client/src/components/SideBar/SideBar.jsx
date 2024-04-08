@@ -63,7 +63,7 @@ function SideBar() {
   });
 
   return (
-    <div className={`fixed left-0 ${open ? "w-64" : "w-16"} duration-300 h-screen dark:bg-[#242526] bg-white dark:border-[#3A3B3C] border-r-[1px]`}>
+    <div className={`sticky left-0 top-0 ${open ? "w-64" : "w-16"} duration-300 h-screen dark:bg-[#242526] bg-white dark:border-[#3A3B3C] border-r-[1px]`}>
       <div className="flex items-center py-5 ">
         <Link 
           to="/"
