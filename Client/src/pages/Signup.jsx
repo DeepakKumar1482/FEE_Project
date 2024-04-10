@@ -54,7 +54,6 @@ const Signup = () => {
                         <Input placeholder='Password' />
                     </Form.Item>
                     <button type='submit' className='w-full h-11 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4'>
-                        {/* Signup with mail */}
                         {params==='signup' ? 'Signup with mail' : 'Signin with mail'}
                     </button>
                 </Form>
