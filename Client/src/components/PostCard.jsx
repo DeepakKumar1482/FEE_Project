@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link} from 'react-router-dom';
 import {ModalPost} from "./index"
 
 function PostCard() {
@@ -33,7 +33,7 @@ function PostCard() {
     },[postData])
 
   return (
-    <div className='flex flex-col gap-2 w-[28rem] px-5 py-8 rounded-xl justify-evenly min-h-screen'>
+    <div className='flex flex-col gap-2 w-[30rem] px-5 py-8 rounded-xl justify-evenly h-screen'>
         <div className='flex gap-2 items-center'>
             <div>
                 {/* <img src={postData.avatar} alt="" /> */}
@@ -59,7 +59,10 @@ function PostCard() {
 
         <div  className='dark:text-white text-gray-800 '>
             <p ref={myRef} className='h-[4.5rem] overflow-y-hidden' >{postData.caption}</p>
-            {isOpen? <div onClick={() => setIsModalPostOpen(true)} className='cursor-pointer text-indigo-400 hover:text-indigo-500 active:text-indigo-600'>view more...</div> : null}
+            {isOpen? <div onClick={() => {
+                document.body.style.overflowY = 'hidden';
+                setIsModalPostOpen(true);
+                }} className='cursor-pointer text-indigo-400 hover:text-indigo-500 active:text-indigo-600'>view more...</div> : null}
         </div> {/* caption */}
 
         <div className='flex items-center justify-between pr-0'>
@@ -73,7 +76,11 @@ function PostCard() {
             </Link>
         </div> {/* time and github repo button */}
         <div className='flex text-3xl dark:text-white text-gray-800 gap-5'>
-            <i onClick={() => setIsModalPostOpen(true)} className='bx bx-message-rounded cursor-pointer dark:hover:text-gray-300'></i>
+            <i onClick={() => {
+                document.body.style.overflowY = 'hidden';
+                setIsModalPostOpen(true);
+                }} 
+                className='bx bx-message-rounded cursor-pointer dark:hover:text-gray-300'></i>
             <i className='bx bx-heart cursor-pointer dark:hover:text-gray-300' onClick={(e) => {
                 e.currentTarget.classList.toggle('bxs-heart');
             }}></i>
@@ -82,7 +89,10 @@ function PostCard() {
             }}></i>
         </div> {/* comments like and bookmark button */}
         <hr className='dark:bg-white bg-gray-700 h-[1.5px]' />
-        {isModalPostOpen && <ModalPost onClose ={() => setIsModalPostOpen(false)}/>}
+        {isModalPostOpen && <ModalPost onClose ={() => {
+            document.body.style.overflowY = 'visible';
+            setIsModalPostOpen(false);
+            }}/>}
     </div>
   )
 }

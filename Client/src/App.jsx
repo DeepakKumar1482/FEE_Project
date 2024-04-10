@@ -1,16 +1,19 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { PostCard, SideBar } from './components'
-import Signup from './pages/Signup'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { PostCard, SideBar, Footer } from './components'
+import {Signup, Home} from "./pages"
+import Layout from './Layout'
 function App() {
   return (
-    <BrowserRouter>
-    <Routes>
-      <Route element={<SideBar />} path='/'/>
-      <Route element={<Signup  />} path='/:signup'/>
-      <Route element={<Signup  />} path='/:signin'/>
-      <Route element={<PostCard  />} path='/postcard'/>
-    </Routes>
-    </BrowserRouter>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Footer />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/layout" element={<Layout />}>
+          <Route index element={<Home />} />
+          {/* <Route path="about" element={<About />} /> */}
+        </Route>
+      </Routes>
+    </Router>
   )
 }
 

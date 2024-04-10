@@ -41,6 +41,12 @@ function SideBar() {
     }
   }
   const [open, setOpen] = useState(handleSize);
+  const [themeMode, setThemeMode] = useState("light");
+
+  useEffect(() => {
+    document.querySelector('html').classList.remove('light', 'dark');
+    document.querySelector('html').classList.add(themeMode);
+  } , [themeMode]);
 
   // useEffect(() => {
   //   window.addEventListener('resize', function handleChange(){
@@ -70,7 +76,7 @@ function SideBar() {
           className='flex text-[#695CFE] cursor-pointer flex-row items-center h-12 dark:hover:text-gray-300 hover:text-gray-800 mb-2'>
         <div className='flex justify-start items-center'>
           <span className="inline-flex items-center justify-center h-12 w-12 text-5xl ml-2"><i className={`bx bx-user`}></i></span>
-          <div className={`flex flex-col justify-center ml-1 ${open ? "" : "scale-0"} duration-300`}>
+          <div className={`flex flex-col justify-center ml-1 ${open ? "block" : "hidden"} duration-300`}>
             <p className='text-2xl font-[550] '>CODEBUDDY</p>
             <p className='text-gray-800 font-medium text-xs ml-[2px] dark:text-white'>Coding Together Now</p>
           </div>
@@ -86,25 +92,46 @@ function SideBar() {
               to={item.slug}
               className='flex cursor-pointer flex-row items-center h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] transition-bg-color justify-between'
               >
-                <div className='flex justify-start items-center'>
+                <div className='flex justify-start items-center w-fit'>
                   <span className="inline-flex relative items-center justify-center h-12 w-12 mr-1 text-2xl"><i className={`bx bx-${item.icon}`}>{((item.name == "Notifications" || item.name == "Messages") && !open) ? <div className='w-2 h-2 bg-red-500 rounded absolute top-2'></div> : null}</i></span>
-                  <span className={`text-base font-[550] ${open ? "" : "scale-0"} duration-300`}>{item.name}</span>
+                  <span className={`text-base font-[550] ${open ? "block" : "hidden"} duration-300`}>{item.name}</span>
                 </div>
-                <span className={`${((item.name == "Notifications" || item.name == "Messages") && open) ? "" : "scale-0"} mr-6 text-sm bg-red-100 rounded-full float-right px-3 py-px text-red-500`}>5</span>
+                <span className={`${((item.name == "Notifications" || item.name == "Messages") && open) ? "" : "scale-0"} mr-6 text-sm bg-red-100 rounded-full ml-2 px-3 py-px text-red-500`}>5</span>
                 {/* {((item.name == "Notifications" || item.name == "Messages") && open) ? <span className="mr-6 text-sm bg-red-100 rounded-full float-right px-3 py-px text-red-500">5</span> : null} */}
               </Link>
             </li>
           ))}
+          <li key="theme-switcher">
+            <label htmlFor='toggle-btn' className='flex cursor-pointer relative flex-row items-center h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] transition-bg-color justify-between'>              
+              <label className="inline-flex items-center cursor-pointer">
+                <input 
+                id='toggle-btn'
+                type="checkbox" 
+                value="" className="sr-only peer"
+                onClick={(e) => {
+                  if(e.currentTarget.checked){
+                    setThemeMode('dark')
+                  }
+                  else{
+                    setThemeMode('light');
+                  }
+                }}
+                />
+                <div className={`relative ${open ? "w-10" : "w-10"} ml-1 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-[#695CFE] rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[1.1rem] after:w-[1.1rem] after:transition-all dark:border-gray-600 peer-checked:bg-[#695CFE]`}></div>
+                <span className={`text-base font-[550] ml-1 ${open ? "block" : "hidden"} duration-300`}>{themeMode == "dark"? "Light Mode" : "Dark Mode"}</span>
+              </label>
+            </label>
+          </li>
         </ul>
         <div className='absolute bottom-2 w-full px-2'>
           <NavLink 
-          to='/'
+          to='/layout'
           className={({isActive}) => 
           `flex flex-row items-center  h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] ${isActive? "text-gray-500" : "text-gray-800"}`}
           >
             <div className='flex justify-start items-center'>
               <span className="inline-flex items-center justify-center h-12 w-12 text-2xl mr-1"><i className={`bx bx-user`}></i></span>
-              <span className={`text-base font-[550] ${open ? "" : "scale-0"}`}>Profile</span>
+              <span className={`text-base font-[550] ${open ? "block" : "hidden"}`}>Profile</span>
             </div>
           </NavLink>
         </div>

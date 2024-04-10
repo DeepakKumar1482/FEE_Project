@@ -7,7 +7,8 @@ import Google from '../assets/Google.webp'
 import {useParams} from 'react-router-dom'
 const Signup = () => {
     const param = useParams();
-    const [params,setparams]=useState(param.signup)
+    // const [params,setparams]=useState(param.signup)
+    const [params,setparams]=useState("signup")
     const googleauthProvider=new GoogleAuthProvider();
     const db= getAuth(app);
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Signup = () => {
         createUserWithEmailAndPassword(db, values.email, values.password)
             .then(() => {
                 message.success("Successfully Signed up");
-                navigate('/');
+                navigate('/layout');
             })
             .catch((error) => {
                 console.error("Error signing up:", error.message);
@@ -26,7 +27,7 @@ const Signup = () => {
     const signupWithGoogle=()=>{
         signInWithPopup(db,googleauthProvider).then(()=>{
           message.success("Successfully Signedup"); 
-          navigate('/');
+          navigate('/layout');
         }).catch(()=>{
             message.error("Wrong Credentials");
         })
@@ -35,7 +36,8 @@ const Signup = () => {
     const signin=(values)=>{
         signInWithEmailAndPassword(db,values.email,values.password).then(()=>{
             message.success("Successfully Signedin");
-            navigate('/')
+            navigate('/layout');
+            console.log('navigated');
         }).catch((e)=>{
             console.log(e);
             message.error("Signin Failed");
@@ -44,7 +46,7 @@ const Signup = () => {
     return (
         <div className='h-screen w-screen flex justify-center items-center'>
             <div className='w-1/3 h-1/2 shadow-md rounded-md border border-gray-300 px-10'>
-                <Form onFinish={ params==='signup' ? signup : signin} className='pt-10'>
+                <Form onFinish={ params=='signup' ? signup : signin} className='pt-10'>
                     <Form.Item name='email'>
                         <Input placeholder='Email' />
                     </Form.Item>

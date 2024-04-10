@@ -3,7 +3,7 @@ import { PostCard } from '../components'
 
 function Home() {
   return (
-    <div>
+    <div className=''>
         <PostCard/>
         <PostCard/>
         <PostCard/>
