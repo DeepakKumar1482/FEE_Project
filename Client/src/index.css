@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-#tech-stack-postcard::-webkit-scrollbar{
+.hide-scrollbar::-webkit-scrollbar{
     display: none;
 }

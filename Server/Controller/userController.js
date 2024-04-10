@@ -8,9 +8,11 @@ const newUserController = async(req, res) => {
             name: req.body.name,
             username: req.body.username,
             techStack: req.body.techStack,
-            studyingAt: req.body.studyingAt,
-            email: req.body.email,
-            githubid: req.body.githubid
+            studyingAt: req.body.university,
+            githubid: req.body.githubName,
+            imageurl: req.body.imageurl,
+            savedposts: [],
+            connections: []
         });
         console.log("Document written with ID: ", docRef.id);
         res.status(200).send({

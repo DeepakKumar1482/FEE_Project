@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
+import {ModalPost} from "./index"
 
 function PostCard() {
     const postData = {
+        postId: '',
         avatar: 'https://google.com',
         name: 'Aryan Singh',
         username: 'aryansingh645',
@@ -12,11 +14,12 @@ function PostCard() {
         timeOfPost: '02:03 PM Apr 4, 2024',
         gitHubRepo: 'https://github.com/',
         comments : {},
-        likes: [],
+        likes: {},
         saved: true
     };
 
     const[isOpen, setIsOpen] = useState(false);
+    const[isModalPostOpen, setIsModalPostOpen] = useState(false);
 
     const myRef = useRef(null);
     useEffect(() => {
@@ -45,9 +48,9 @@ function PostCard() {
             <img className='rounded-xl' src={postData.postImage} alt="" />
         </div> {/* post image */}
 
-        <div id='tech-stack-postcard' className='flex gap-2 overflow-x-scroll'>
+        <div className='flex hide-scrollbar gap-2 overflow-x-scroll'>
             {postData.techStack.map((tech) => (
-                <div className='flex items-center gap-1 dark:text-white bg-gray-200 dark:bg-gray-700 rounded-md px-2 py-1 min-w-fit'>
+                <div key={tech} className='flex items-center gap-1 dark:text-white bg-gray-200 dark:bg-gray-700 rounded-md px-2 py-1 min-w-fit'>
                     <div className='bg-green-600 w-2 h-2 rounded'></div>
                     <p>{tech}</p>
                 </div>
@@ -55,8 +58,8 @@ function PostCard() {
         </div> {/* tech stack */}
 
         <div  className='dark:text-white text-gray-800 '>
-            <p ref={myRef} className='h-[4.5rem] overflow-y-hidden' onc>{postData.caption}</p>
-            {isOpen? <div className='cursor-pointer text-indigo-400 hover:text-indigo-500'>view more...</div> : null}
+            <p ref={myRef} className='h-[4.5rem] overflow-y-hidden' >{postData.caption}</p>
+            {isOpen? <div onClick={() => setIsModalPostOpen(true)} className='cursor-pointer text-indigo-400 hover:text-indigo-500 active:text-indigo-600'>view more...</div> : null}
         </div> {/* caption */}
 
         <div className='flex items-center justify-between pr-0'>
@@ -70,7 +73,7 @@ function PostCard() {
             </Link>
         </div> {/* time and github repo button */}
         <div className='flex text-3xl dark:text-white text-gray-800 gap-5'>
-            <i className='bx bx-message-rounded cursor-pointer dark:hover:text-gray-300'></i>
+            <i onClick={() => setIsModalPostOpen(true)} className='bx bx-message-rounded cursor-pointer dark:hover:text-gray-300'></i>
             <i className='bx bx-heart cursor-pointer dark:hover:text-gray-300' onClick={(e) => {
                 e.currentTarget.classList.toggle('bxs-heart');
             }}></i>
@@ -79,6 +82,7 @@ function PostCard() {
             }}></i>
         </div> {/* comments like and bookmark button */}
         <hr className='dark:bg-white bg-gray-700 h-[1.5px]' />
+        {isModalPostOpen && <ModalPost onClose ={() => setIsModalPostOpen(false)}/>}
     </div>
   )
 }
