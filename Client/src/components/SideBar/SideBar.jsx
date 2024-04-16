@@ -41,7 +41,7 @@ function SideBar() {
     }
   }
   const [open, setOpen] = useState(handleSize);
-  const [themeMode, setThemeMode] = useState("light");
+  const [themeMode, setThemeMode] = useState('light');
 
   useEffect(() => {
     document.querySelector('html').classList.remove('light', 'dark');
@@ -118,7 +118,7 @@ function SideBar() {
                 }}
                 />
                 <div className={`relative ${open ? "w-10" : "w-10"} ml-1 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-[#695CFE] rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[1.1rem] after:w-[1.1rem] after:transition-all dark:border-gray-600 peer-checked:bg-[#695CFE]`}></div>
-                <span className={`text-base font-[550] ml-1 ${open ? "block" : "hidden"} duration-300`}>{themeMode == "dark"? "Light Mode" : "Dark Mode"}</span>
+                <span className={`text-base font-[550] ml-2 ${open ? "block" : "hidden"} duration-300`}>{themeMode == "dark"? "Light Mode" : "Dark Mode"}</span>
               </label>
             </label>
           </li>

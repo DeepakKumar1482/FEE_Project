@@ -59,10 +59,10 @@ function PostCard() {
 
         <div  className='dark:text-white text-gray-800 '>
             <p ref={myRef} className='h-[4.5rem] overflow-y-hidden' >{postData.caption}</p>
-            {isOpen? <div onClick={() => {
+            {isOpen? <span onClick={() => {
                 document.body.style.overflowY = 'hidden';
                 setIsModalPostOpen(true);
-                }} className='cursor-pointer text-indigo-400 hover:text-indigo-500 active:text-indigo-600'>view more...</div> : null}
+                }} className='cursor-pointer text-blue-400 hover:text-blue-500 active:text-indigo-600'>view more...</span> : null}
         </div> {/* caption */}
 
         <div className='flex items-center justify-between pr-0'>
@@ -80,11 +80,11 @@ function PostCard() {
                 document.body.style.overflowY = 'hidden';
                 setIsModalPostOpen(true);
                 }} 
-                className='bx bx-message-rounded cursor-pointer dark:hover:text-gray-300'></i>
-            <i className='bx bx-heart cursor-pointer dark:hover:text-gray-300' onClick={(e) => {
+                className='bx bx-message-rounded cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]'></i>
+            <i className='bx bx-heart cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]' onClick={(e) => {
                 e.currentTarget.classList.toggle('bxs-heart');
             }}></i>
-            <i className='bx bx-bookmark cursor-pointer dark:hover:text-gray-300' onClick={(e) => {
+            <i className='bx bx-bookmark cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]' onClick={(e) => {
                 e.currentTarget.classList.toggle('bxs-bookmark');
             }}></i>
         </div> {/* comments like and bookmark button */}
