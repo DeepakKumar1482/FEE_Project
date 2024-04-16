@@ -165,7 +165,6 @@ const num = 1234555;
         <i onClick={onClose} className='bx bx-x absolute top-0 dark:text-white text-gray-800 text-5xl cursor-pointer'></i>
       </div>
       {isLikeModal && <LikesModalComp onClose ={() => {
-            document.body.style.overflowY = 'visible';
             setIsLikeModal(false);
             }}/>}
     </div>
