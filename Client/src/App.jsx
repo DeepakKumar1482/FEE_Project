@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { PostCard, SideBar, Footer } from './components'
 import {Signup, Home, Profile} from "./pages"
 import Layout from './Layout'
+import CreatePost from './components/CreatePost'
 function App() {
   return (
     <Router>
@@ -11,7 +12,7 @@ function App() {
         <Route path="/profile-view" element={<Profile />} />
         <Route path="/layout" element={<Layout />}>
           <Route index element={<Home />} />
-          {/* <Route path="about" element={<About />} /> */}
+          <Route path="post" element={<CreatePost />} />
         </Route>
       </Routes>
     </Router>

@@ -90,6 +90,7 @@ const Profile = () => {
     try {
       const res = await axios.post('http://localhost:8080/api/user/createuser', { githubName, imageurl, ...values });
       if (res.data.success) {
+        localStorage.setItem("token",res.data.token);
         message.success(res.data.message);
         navigate('/layout');
       } else {
