@@ -8,8 +8,9 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Footer />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/profile-view" element={<Profile />} />
+        <Route path="/:signup" element={<Signup />} />
+        <Route path="/:signin" element={<Signup />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/layout" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="post" element={<CreatePost />} />

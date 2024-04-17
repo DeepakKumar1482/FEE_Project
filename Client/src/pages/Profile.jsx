@@ -140,7 +140,7 @@ const Profile = () => {
   }
   return (
     <div className='h-screen w-screen flex' style={{backgroundImage: `url(${Formbackground})`, backgroundSize: 'cover'}}>
-      <div  className='h-auto lg:w-2/3 w-full m-5 rounded-md lg:overflow-hidden flex-col md:ml-5 mx-2'>
+      <div  className='h-auto lg:w-2/3 w-full  rounded-md lg:overflow-hidden flex-col md:ml-5 mx-2'>
           <div className='lg:h-1/6 lg:w-4/5 lg:mt-10 lg:ml-10 flex justify-center items-end pt-5'>
             <label htmlFor="file-input" className="h-20 w-20 flex items-center justify-center">
               {selectedimage ?
@@ -164,6 +164,9 @@ const Profile = () => {
               </Form.Item>
               <Form.Item name='username' className=''>
                 <Input onChange={(e) => setUserName(e.target.value)} placeholder='Username' />
+              </Form.Item>
+              <Form.Item name='password' className=''>
+                <Input.Password type='password' placeholder='Password' />
               </Form.Item>
               <Form.Item name='university' className=''>
                 <Select mode='single' className='w-full' placeholder='University'>

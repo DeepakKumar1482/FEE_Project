@@ -4,13 +4,61 @@ const app = getFirestore(db);
 const usersRef = collection(app, "users");
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const LogincheckController = async(req, res) => {
+    try {
+        const { username, password } = req.body;
+        // Check if the user exists
+        const usernameQuery = query(usersRef, where("username", "==", username));
+        const querySnapshot = await getDocs(usernameQuery);
+        if (querySnapshot.empty) {
+            return res.status(200).send({
+                success: false,
+                message: "Invalid credentials"
+            });
+        }
+
+        // If the user exists, compare the provided password with the stored hash
+        let userPassword;
+        querySnapshot.forEach((doc) => {
+            const userData = doc.data();
+            userPassword = userData.password;
+        });
+        console.log('userPassword', userPassword);
+        console.log('entered password', password);
+        const ismatch = await bcrypt.compare(password, userPassword);
+        if (!ismatch) {
+            return res.status(200).send({
+                success: false,
+                message: "Invalid password"
+            });
+        }
+
+        // If the password is correct, return a success message
+        res.status(200).send({
+            success: true,
+            message: 'Logged in'
+        });
+
+    } catch (e) {
+        // If there's an error, return an internal server error message
+        res.status(500).send({
+            success: false,
+            message: "Internal server error"
+        });
+        console.log(e);
+    }
+}
 const newUserController = async(req, res) => {
 
     try {
-        const { name, username, techStack, university } = req.body;
+        const { name, username, techStack, university, password } = req.body;
+        const salt = await bcrypt.genSalt(10);
+        const hashedpassword = await bcrypt.hash(password, salt);
         const docRef = await addDoc(usersRef, {
             name: name,
             username: username,
+            password: hashedpassword,
             techStack: techStack,
             studyingAt: university,
             githubid: req.body.githubName,
@@ -95,5 +143,6 @@ const CreatePostController = async(req, res) => {
 module.exports = {
     newUserController,
     IsUserExist,
-    CreatePostController
+    CreatePostController,
+    LogincheckController
 };
