@@ -13,6 +13,9 @@ export default {
       fontFamily:{
         'proxima-nova': ['Proxima Nova', 'sans-serif'],
       },
+      objectFit: {
+        'contain': 'object-fit-contain',
+      },
     },
   },
   plugins: [],

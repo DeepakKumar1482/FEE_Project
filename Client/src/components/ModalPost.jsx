@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
 import {motion} from "framer-motion";
 import {LikesModalComp} from "./index.js"
+import myImg from "../images/Screenshot 2024-03-29 112144.png";
+
 function ModalPost({onClose}) {
 
   const postData = {
@@ -8,7 +10,7 @@ function ModalPost({onClose}) {
     avatar: 'https://google.com',
     name: 'Aryan Singh',
     username: 'aryansingh645',
-    postImage: 'https://media.istockphoto.com/id/649356542/photo/adventurous-people-making-ascent-to-high-mountain-walking-on-glacier.jpg?s=2048x2048&w=is&k=20&c=9DT0JR9qlhdI2dfFHKQ5V7vuIRYb0AilSk7y_c1EmpE=',
+    postImage: myImg,
     techStack: ['React', 'Antd', 'Mongo DB', 'Firebase','gohoi','hhgaoag'],
     caption: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan',
     timeOfPost: '02:03 PM Apr 4, 2024',

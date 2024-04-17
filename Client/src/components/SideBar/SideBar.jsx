@@ -25,6 +25,11 @@ function SideBar() {
       icon: 'bookmark'
     }, 
     {
+      name: 'Add Post',
+      slug: '/add-post',
+      icon: 'plus-circle'
+    }, 
+    {
       name: 'Notifications',
       slug: '/notifications',
       icon: 'bell'
