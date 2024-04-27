@@ -2,6 +2,7 @@ const { getFirestore, collection, addDoc, where, query, getDocs, updateDoc, setD
 const { db } = require('../Firebase/config.js');
 const app = getFirestore(db);
 const usersRef = collection(app, "users");
+const postsRef = collection(app, "posts");
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -35,9 +36,12 @@ const LogincheckController = async(req, res) => {
         }
 
         // If the password is correct, return a success message
+        const secretKey = "DeepakKumar1482"
+        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' })
         res.status(200).send({
             success: true,
-            message: 'Logged in'
+            message: 'Logged in',
+            token
         });
 
     } catch (e) {
@@ -110,24 +114,45 @@ const IsUserExist = async(req, res) => {
 const CreatePostController = async(req, res) => {
     try {
         const username = req.userName;
-        const { imageurl, description, githubRepo, tech, time, date } = req.body;
-        // const {} = req.body;
+        imageurls = req.body.imageUrls;
+        const { description, githubRepo, tech, currDate, currTime } = req.body;
         const usernameQuery = query(usersRef, where("username", "==", username));
         const querySnapshot = await getDocs(usernameQuery);
         querySnapshot.forEach((doc) => {
             const userData = doc.data();
             const updatedSavedPosts = [...userData.savedposts, {
-                imageurl,
+                imageurls,
                 description,
                 githubRepo,
                 tech,
-                timing: {
-                    time,
-                    date
+                Time: {
+                    date: currDate,
+                    time: currTime
                 }
             }];
             setDoc(doc.ref, { savedposts: updatedSavedPosts }, { merge: true });
         });
+        let name, avatar;
+        querySnapshot.forEach((doc) => {
+            const userData = doc.data();
+            name = userData.name;
+            avatar = userData.imageurl;
+        })
+        const post = await addDoc(postsRef, {
+            post: [{
+                name,
+                avatar,
+                username,
+                imageurls,
+                description,
+                githubRepo,
+                tech,
+                Time: {
+                    date: currDate,
+                    time: currTime
+                }
+            }]
+        })
         res.status(200).send({
             success: true,
             message: 'Saved'
@@ -144,5 +169,6 @@ module.exports = {
     newUserController,
     IsUserExist,
     CreatePostController,
+    LogincheckController,
     LogincheckController
 };

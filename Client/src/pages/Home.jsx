@@ -5,8 +5,6 @@ function Home() {
   return (
     <div className=''>
         <PostCard/>
-        <PostCard/>
-        <PostCard/>
     </div>
   )
 }

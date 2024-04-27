@@ -1,55 +1,73 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Link} from 'react-router-dom';
-import {ModalPost} from "./index"
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ModalPost } from "./index";
+import axios from 'axios';
 
 function PostCard() {
-    const postData = {
-        postId: '',
-        avatar: 'https://google.com',
-        name: 'Aryan Singh',
-        username: 'aryansingh645',
-        postImage: 'https://media.istockphoto.com/id/649356542/photo/adventurous-people-making-ascent-to-high-mountain-walking-on-glacier.jpg?s=2048x2048&w=is&k=20&c=9DT0JR9qlhdI2dfFHKQ5V7vuIRYb0AilSk7y_c1EmpE=',
-        techStack: ['React', 'Antd', 'Mongo DB', 'Firebase','gohoi','hhgaoag'],
-        caption: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan',
-        timeOfPost: '02:03 PM Apr 4, 2024',
-        gitHubRepo: 'https://github.com/',
-        comments : {},
-        likes: {},
-        saved: true
+    const [isOpen, setIsOpen] = useState(false);
+    const [isModalPostOpen, setIsModalPostOpen] = useState(false);
+    const [posts, setPosts] = useState([]);
+    const myRef = useRef(null);
+    const [flag,setflag]=useState(0);
+    useEffect(() => {
+        if (flag=== 0) {    
+            console.log('inside if -> ', flag);
+            fetchPosts();
+        }
+        setflag(1);
+    }, []);
+
+    const fetchPosts = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/posts/getposts', {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            const postsData = response.data.posts;
+            console.log(postsData);
+            setPosts(postsData);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const[isOpen, setIsOpen] = useState(false);
-    const[isModalPostOpen, setIsModalPostOpen] = useState(false);
-
-    const myRef = useRef(null);
     useEffect(() => {
-        const container = myRef.current;
-        if(container.scrollHeight > container.clientHeight){
-            setIsOpen(true);
+        if (myRef.current) {
+            const container = myRef.current;
+            if (container.scrollHeight > container.clientHeight) {
+                setIsOpen(true);
+            } else {
+                setIsOpen(false);
+            }
         }
-        else{
-            setIsOpen(false);
-        }
-    },[postData])
+    }, [posts]);
 
-  return (
-    <div className='flex flex-col gap-2 w-[30rem] px-5 py-8 rounded-xl justify-evenly h-screen'>
-        <div className='flex gap-2 items-center'>
+    const card = () => {
+        return (
+            posts.map((postdata, key) => (
+                <div key={key} className='flex flex-col gap-2 w-[30rem] px-5 py-8 rounded-xl justify-evenly h-screen' ref={myRef}>
+                    <div className='flex gap-2 items-center '>
             <div>
                 {/* <img src={postData.avatar} alt="" /> */}
-                <i className='bx bx-user text-4xl'></i>
+                <i className='h-5 w-5'>
+                    <img className='h-10 w-10 rounded-full' src={postdata.post[0].avatar} alt="" />
+                </i>
             </div>
             <div className='flex flex-col'>
-                <p className='dark:text-white text-gray-800 font-semibold font-sans'>{postData.name}</p>
-                <p className='dark:text-white text-gray-800 font-semibold font-sans -mt-1'>@ {postData.username}</p>
+                <p className='dark:text-white text-gray-800 font-semibold font-sans'>{postdata.post[0].name}</p>
+                <p className='dark:text-white text-gray-800 font-semibold font-sans -mt-1'>@ {postdata.post[0].username}</p>
             </div>
         </div> {/* avatar username */}
-        <div  className='flex justify-center'>
-            <img className='rounded-xl' src={postData.postImage} alt="" />
+        <div  className='grid grid-cols-2 min-w-52 min-h-44 gap-2'>
+        {/*flex justify-center*/}
+            {postdata.post[0].imageurls.map((url,key)=>(
+                <img key={key} className='rounded-xl w-full h-full' src={url} alt="" />
+            ))}
         </div> {/* post image */}
 
         <div className='flex hide-scrollbar gap-2 overflow-x-scroll'>
-            {postData.techStack.map((tech) => (
+            {postdata.post[0].tech.map((tech) => (
                 <div key={tech} className='flex items-center gap-1 dark:text-white bg-gray-200 dark:bg-gray-700 rounded-md px-2 py-1 min-w-fit'>
                     <div className='bg-green-600 w-2 h-2 rounded'></div>
                     <p>{tech}</p>
@@ -58,7 +76,7 @@ function PostCard() {
         </div> {/* tech stack */}
 
         <div  className='dark:text-white text-gray-800 '>
-            <p ref={myRef} className='h-[4.5rem] overflow-y-hidden' >{postData.caption}</p>
+            <p ref={myRef} className='h-[4.5rem] overflow-y-hidden' >{postdata.post[0].description}</p>
             {isOpen? <div onClick={() => {
                 document.body.style.overflowY = 'hidden';
                 setIsModalPostOpen(true);
@@ -66,9 +84,9 @@ function PostCard() {
         </div> {/* caption */}
 
         <div className='flex items-center justify-between pr-0'>
-            <p className='dark:text-white text-gray-800'>{postData.timeOfPost}</p>
+            <p className='dark:text-white text-gray-800'><span>{postdata.post[0].Time.time}</span> <span>{postdata.post[0].Time.date}</span></p>
             <Link
-            to={postData.gitHubRepo}
+            to={postdata.post[0].githubRepo}
             className='flex items-center gap-1 bg-cyan-600 hover:bg-cyan-700 rounded-lg px-2 py-1 text-white'
             >
                 <i className='bx bxl-github'></i>
@@ -89,12 +107,18 @@ function PostCard() {
             }}></i>
         </div> {/* comments like and bookmark button */}
         <hr className='dark:bg-white bg-gray-700 h-[1.5px]' />
-        {isModalPostOpen && <ModalPost onClose ={() => {
+        {isModalPostOpen && <ModalPost data={postdata.post[0]} onClose ={() => {
             document.body.style.overflowY = 'visible';
             setIsModalPostOpen(false);
             }}/>}
-    </div>
-  )
+                </div>
+            ))
+        );
+    };
+
+    return (
+        card()
+    );
 }
 
-export default PostCard
+export default PostCard;
