@@ -80,7 +80,7 @@ const CreatePost = () => {
     if(res.data.success){
       message.success('Saved');
       setLoader(false);
-      navigate('/layout');
+      navigate('/');
     }
     }catch (error) {
       console.log(error);

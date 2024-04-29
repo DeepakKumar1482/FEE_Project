@@ -43,7 +43,7 @@ const Signup = () => {
             .then(() => {
                 message.success("Successfully Signedup");
                 setloading(false);
-                navigate('/layout');
+                navigate('/profile');
             })
             .catch((error) => {
                 message.error('Email already exists');
@@ -74,8 +74,8 @@ const Signup = () => {
     console.log(creationtimeString);
     console.log(lastlogintimeString);
     if(creationtimeString==lastlogintimeString){
-        message.success('Signed in successfully');
-        navigate('/layout');
+        message.success('Signed up successfully');
+        navigate('/profile');
     }else{
         message.error('Already have an account');
         navigate('/signin');
@@ -92,7 +92,7 @@ const Signup = () => {
             if(res.data.success) {
                 message.success(res.data.message);
                 localStorage.setItem("token",res.data.token);
-                navigate('/layout');
+                navigate('/');
             }else{
                 message.error(res.data.message);
             }

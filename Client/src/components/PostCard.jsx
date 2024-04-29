@@ -9,6 +9,7 @@ function PostCard() {
     const [posts, setPosts] = useState([]);
     const myRef = useRef(null);
     const [flag,setflag]=useState(0);
+    const [propdata,setpropdata]=useState({});
     useEffect(() => {
         if (flag=== 0) {    
             console.log('inside if -> ', flag);
@@ -80,7 +81,7 @@ function PostCard() {
             {isOpen? <div onClick={() => {
                 document.body.style.overflowY = 'hidden';
                 setIsModalPostOpen(true);
-                }} className='cursor-pointer text-indigo-400 hover:text-indigo-500 active:text-indigo-600'>view more...</div> : null}
+                }} className='cursor-pointer text-blue-400 hover:text-blue-500 active:text-indigo-600'>view more...</div> : null}
         </div> {/* caption */}
 
         <div className='flex items-center justify-between pr-0'>
@@ -97,17 +98,18 @@ function PostCard() {
             <i onClick={() => {
                 document.body.style.overflowY = 'hidden';
                 setIsModalPostOpen(true);
+                setpropdata(postdata.post[0]);
                 }} 
-                className='bx bx-message-rounded cursor-pointer dark:hover:text-gray-300'></i>
-            <i className='bx bx-heart cursor-pointer dark:hover:text-gray-300' onClick={(e) => {
+                className='bx bx-message-rounded cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]'></i>
+            <i className='bx bx-heart cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]' onClick={(e) => {
                 e.currentTarget.classList.toggle('bxs-heart');
             }}></i>
-            <i className='bx bx-bookmark cursor-pointer dark:hover:text-gray-300' onClick={(e) => {
+            <i className='bx bx-bookmark cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]' onClick={(e) => {
                 e.currentTarget.classList.toggle('bxs-bookmark');
             }}></i>
         </div> {/* comments like and bookmark button */}
         <hr className='dark:bg-white bg-gray-700 h-[1.5px]' />
-        {isModalPostOpen && <ModalPost data={postdata.post[0]} onClose ={() => {
+        {isModalPostOpen &&<ModalPost data={propdata} onClose ={() => {
             document.body.style.overflowY = 'visible';
             setIsModalPostOpen(false);
             }}/>}

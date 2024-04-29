@@ -1,5 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {motion} from "framer-motion";
+import {LikesModalComp} from "./index.js"
+import myImg from "../images/Screenshot 2024-03-29 112144.png";
 
 function ModalPost({onClose,data}) {
   console.log("This is from props -> ",data);
@@ -12,6 +14,10 @@ const closeModal = (e) => {
     onClose();
   }
 }
+
+const [isLikeModal, setIsLikeModal] = useState(false);
+const num = 1234555;
+
 
   return (
     <div 
@@ -64,7 +70,7 @@ const closeModal = (e) => {
           </div> */}
           <div className='sticky w-full px-3 py-1 pb-2 flex flex-col gap-2 bottom-0 dark:bg-[#242526] bg-white'>
             <hr />
-            <div className='flex text-3xl justify-between dark:text-white text-gray-800 gap-5'>
+            <div className='flex text-3xl justify-between dark:text-white text-gray-800'>
               <div className='flex gap-2'>
                 <i className='bx bx-message-rounded cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]'></i>
                 <i className='bx bx-heart cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]' onClick={(e) => {
@@ -76,12 +82,19 @@ const closeModal = (e) => {
               </div>
               <i className='bx bx-send cursor-pointer active:scale-[.85] dark:hover:text-gray-300 hover:text-gray-500 duration-100'></i>
             </div>
-            <div className='relative'>
+            <div className='dark:text-white text-gray-800'>
+              <span onClick={() => {
+                document.body.style.overflowY = 'hidden';
+                setIsLikeModal(true);
+              }} 
+              className='hover:text-blue-400 px-1 cursor-pointer active:text-blue-500'>{num.toLocaleString('hi-IN')} Likes</span>
+            </div>
+            <div className='flex items-end gap-4'>
                 <textarea 
                 placeholder='Add Comment...'
-                className='focus:outline-none focus:border-b-[1px] mb-[1px] w-full dark:text-white text-gray-800 bg-transparent resize-none h-12 placeholder:align-text-bottom'
+                className='focus:outline-none border-b-[1px] mb-[1px] w-full dark:text-white text-gray-800 bg-transparent resize-none h-12 placeholder:px-1 placeholder:bottom-1 placeholder:absolute focus-within:placeholder:text-transparent'
                 />
-                <button className='absolute right-0 bottom-3 text-white hover:bg-[#5E52E3] hover:scale-95 duration-200 active:bg-[#574DD4] active:scale-90 bg-[#695CFE] px-4 py-1 rounded-xl'>Post</button>
+                <button className='text-white hover:bg-[#5E52E3] hover:scale-95 duration-200 active:bg-[#574DD4] active:scale-90 bg-[#695CFE] px-4 py-1 h-fit rounded-xl'>Post</button>
             </div>
           </div>{/*Likes && Add Comment*/}
         </div>{/*Caption, Comment and Likes Side*/}
@@ -89,6 +102,9 @@ const closeModal = (e) => {
       <div>
         <i onClick={onClose} className='bx bx-x absolute top-0 dark:text-white text-gray-800 text-5xl cursor-pointer'></i>
       </div>
+      {isLikeModal && <LikesModalComp onClose ={() => {
+            setIsLikeModal(false);
+            }}/>}
     </div>
   )
 }

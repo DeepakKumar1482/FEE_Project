@@ -92,7 +92,7 @@ const Profile = () => {
       if (res.data.success) {
         localStorage.setItem("token",res.data.token);
         message.success(res.data.message);
-        navigate('/layout');
+        navigate('/');
       } else {
         message.error(res.data.message);
       }

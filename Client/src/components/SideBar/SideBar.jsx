@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {useNavigate, NavLink, Link} from "react-router-dom"
 // import {Button} from '../index'
 
@@ -25,6 +25,11 @@ function SideBar() {
       icon: 'bookmark'
     }, 
     {
+      name: 'Add Post',
+      slug: 'add-post',
+      icon: 'plus-circle'
+    }, 
+    {
       name: 'Notifications',
       slug: '/notifications',
       icon: 'bell'
@@ -41,12 +46,48 @@ function SideBar() {
     }
   }
   const [open, setOpen] = useState(handleSize);
-  const [themeMode, setThemeMode] = useState("light");
+  const [themeMode, setThemeMode] = useState();
+  const themeIcon =  useRef(null);
+  const themeLabel = useRef(null);
+
+  useEffect(() => {
+    const theme = localStorage.getItem('themeMode');
+    if(theme){
+      setThemeMode(theme);
+    }
+    else{
+      setThemeMode('light');
+    }
+  },[])
 
   useEffect(() => {
     document.querySelector('html').classList.remove('light', 'dark');
     document.querySelector('html').classList.add(themeMode);
+    
+    setTimeout(() => {
+        themeIcon.current.classList.remove('bx-moon', 'bx-sun');
+        themeMode == 'dark' ? themeIcon.current.classList.add('bx-sun') : themeIcon.current.classList.add('bx-moon');
+        themeIcon.current.classList.remove('scale-0');
+        themeIcon.current.classList.add('rotate-[360deg]','scale-1');
+      },600)
+      themeIcon.current.classList.remove('rotate-[360deg]');
+
   } , [themeMode]);
+
+  const changeThemeIcon = (e) => {
+      // const theme = themeMode == 'dark' ? 'light' : 'dark';
+      // localStorage.setItem('themeMode',theme);
+      themeIcon.current.classList.add('rotate-[360deg]');
+      themeIcon.current.classList.add('scale-0');
+      // themeIcon.current.classList.remove('bx-moon', 'bx-sun');
+      // themeMode == 'dark' ? themeIcon.current.classList.add('bx-sun') : themeIcon.current.classList.add('bx-moon');
+      // setTimeout(() => {
+      //   themeIcon.current.classList.remove('scale-0');
+      //   themeIcon.current.classList.add('rotate-[360deg]','scale-1');
+      // },600)
+      // themeIcon.current.classList.remove('rotate-[360deg]');
+    
+  }
 
   // useEffect(() => {
   //   window.addEventListener('resize', function handleChange(){
@@ -102,30 +143,36 @@ function SideBar() {
             </li>
           ))}
           <li key="theme-switcher">
-            <label htmlFor='toggle-btn' className='flex cursor-pointer relative flex-row items-center h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] transition-bg-color justify-between'>              
-              <label className="inline-flex items-center cursor-pointer">
+            <label ref={themeLabel} onClick={changeThemeIcon} htmlFor='toggle-btn' className='flex cursor-pointer relative flex-row items-center h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] transition-bg-color justify-between'>              
+              <div className="flex items-center cursor-pointer px-3">
                 <input 
                 id='toggle-btn'
                 type="checkbox" 
                 value="" className="sr-only peer"
-                onClick={(e) => {
-                  if(e.currentTarget.checked){
-                    setThemeMode('dark')
-                  }
-                  else{
-                    setThemeMode('light');
+                onClick={() => {
+                  let theme = themeMode == 'dark' ? 'light' : 'dark';
+                  localStorage.setItem('themeMode',theme);
+                  console.log(theme,"inside get");
+                  if(theme){
+                    setThemeMode(theme);
                   }
                 }}
                 />
-                <div className={`relative ${open ? "w-10" : "w-10"} ml-1 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-[#695CFE] rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[1.1rem] after:w-[1.1rem] after:transition-all dark:border-gray-600 peer-checked:bg-[#695CFE]`}></div>
-                <span className={`text-base font-[550] ml-1 ${open ? "block" : "hidden"} duration-300`}>{themeMode == "dark"? "Light Mode" : "Dark Mode"}</span>
-              </label>
+                {/* <div className={`relative ${open ? "w-10" : "w-10"} ml-1 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-[#695CFE] rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[1.1rem] after:w-[1.1rem] after:transition-all dark:border-gray-600 peer-checked:bg-[#695CFE]`}></div> */}
+                <div className='flex items-center justify-between w-full '>
+                  <i 
+                  ref={themeIcon}
+                  className='bx bx-moon text-2xl duration-500'></i>
+                  <span className={`text-base font-[550] ml-4 ${open ? "block" : "hidden"} duration-300`}>
+                  {themeMode == "dark"? "Light Mode" : "Dark Mode"}</span>
+                </div>
+              </div>
             </label>
           </li>
         </ul>
         <div className='absolute bottom-2 w-full px-2'>
           <NavLink 
-          to='/layout'
+          to='/'
           className={({isActive}) => 
           `flex flex-row items-center  h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] ${isActive? "text-gray-500" : "text-gray-800"}`}
           >
