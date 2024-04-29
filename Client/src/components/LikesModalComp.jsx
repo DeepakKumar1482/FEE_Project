@@ -77,13 +77,13 @@ function LikesModalComp({onClose}) {
     }
   return (
     <div ref={myRef} onClick={onCloseLikeModal} className='fixed inset-0 flex bg-opacity-10 backdrop-blur-sm bg-black dark:bg-white dark:bg-opacity-5 justify-center items-center'>
-        <div className='flex flex-col justify-start dark:bg-[#242526] bg-white rounded-lg w-[22rem] h-[19rem] px-3 py-3'>
-            <div className='flex flex-col items-center justify-center relative dark:text-white text-gray-800 gap-1'>
+        <div className='flex flex-col justify-start dark:bg-[#242526] bg-white rounded-lg w-[22rem] h-[19rem] pl-3 py-3'>
+            <div className='flex flex-col items-center justify-center relative dark:text-white text-gray-800 gap-1 pr-3'>
                 <p className=''>Likes</p>
                 <i onClick={onClose} className=' absolute right-0 -top-[0.4rem] bx bx-x text-3xl cursor-pointer'></i>
                 <hr className='w-full dark:border-t border-t-2 ' />
             </div>
-            <div className='dark:text-white text-gray-800 overflow-y-scroll hide-scrollbar'>
+            <div className='dark:text-white text-gray-800 overflow-y-scroll pr-3 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500'>
                 {postData.likes.map((like) => (
                     <div className='flex gap-3 items-center justify-between' key={like.username}>
                         <div className='flex items-center gap-2'>

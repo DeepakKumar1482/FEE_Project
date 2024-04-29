@@ -1,7 +1,11 @@
 import React, { useRef, useState } from 'react';
 import {motion} from "framer-motion";
-import {LikesModalComp} from "./index.js"
+import ImageCarousel2 from './ImageCarousel2.jsx';
+import ImageCarousel3 from './ImageCarousel3.jsx';
+import {LikesModalComp, ImageCarousel} from "./index.js"
 import myImg from "../images/Screenshot 2024-03-29 112144.png";
+import myImg1 from "../images/free-photo-of-red-cherries-in-bowl-and-basket.jpeg";
+import myImg2 from "../images/tanjiro_hinokami_kagura.jpg";
 
 function ModalPost({onClose,data}) {
   console.log("This is from props -> ",data);
@@ -23,19 +27,22 @@ const num = 1234555;
     <div 
     ref={overlayDivRef} 
     onClick={closeModal}
-    className='fixed inset-0 flex bg-opacity-10 backdrop-blur-sm bg-black dark:bg-white dark:bg-opacity-5 justify-center items-center'>
+    className='fixed z-50 inset-0 flex flex-col bg-opacity-10 backdrop-blur-sm bg-black dark:bg-white dark:bg-opacity-5 justify-center items-center'>
+      <div className='w-full flex justify-end px-8 -'>
+        <i onClick={onClose} className='bx bx-x dark:text-white text-gray-800 text-5xl cursor-pointer'></i>
+      </div>
       <motion.div 
       initial={{scale: 0}}
       animate={{scale: 1}}
-      className='flex justify-center items-center dark:bg-[#242526] bg-white rounded-lg w-[65rem] h-[40rem]'>
-        <div className='w-1/2'>
-          {
-            data.imageurls.map((url)=>(
-          <img key={url} src={url} alt="" srcset="" />  
-            ))
-          }
+      className='flex justify-center items-center dark:bg-[#242526] bg-white rounded-lg w-[65rem] h-[40rem] -mt-4'>
+
+        <div className='flex w-[55%] h-[40rem] rounded-xl justify-center items-center bg-black'>
+            <ImageCarousel3 data={data.imageurls} height={'h-[40rem]'}/>
+          {/* <div className='flex justify-center items-center'> */}
+          {/* </div> */}
         </div> {/*Post Media Side*/}
-        <div className=' dark:bg-[#242526] bg-white hide-scrollbar w-1/2 overflow-y-scroll relative h-full px-0 pt-4 rounded-lg'>
+
+        <div className=' dark:bg-[#242526] bg-white [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 w-[45%] overflow-y-scroll relative h-full px-0 pt-4 rounded-lg'>
           <div className='flex gap-1 px-3 items-center'>
             <div className='rounded text-lg dark:text-white text-gray-800'>
               <img className='w-10 h-10 rounded-full' src={data.avatar} alt="" srcset="" />
@@ -99,12 +106,10 @@ const num = 1234555;
           </div>{/*Likes && Add Comment*/}
         </div>{/*Caption, Comment and Likes Side*/}
       </motion.div>
-      <div>
-        <i onClick={onClose} className='bx bx-x absolute top-0 dark:text-white text-gray-800 text-5xl cursor-pointer'></i>
-      </div>
+      
       {isLikeModal && <LikesModalComp onClose ={() => {
-            setIsLikeModal(false);
-            }}/>}
+        setIsLikeModal(false);
+      }}/>}
     </div>
   )
 }
