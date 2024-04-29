@@ -3,6 +3,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/preline/preline.js"
   ],
   darkMode: 'class',
   theme: {
@@ -18,6 +19,8 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('preline/plugin'),
+  ],
 }
 

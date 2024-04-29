@@ -4,6 +4,8 @@ import PostCard from "./PostCard";
 import ModalPost from "./ModalPost";
 import Footer from "./Footer/Footer";
 import LikesModalComp from "./LikesModalComp";
+import ImageCarousel from "./ImageCarousel";
+import FullPreview from "./FullPreview";
 
 export{
     Button,
@@ -11,5 +13,7 @@ export{
     PostCard,
     ModalPost,
     Footer,
-    LikesModalComp
+    LikesModalComp,
+    ImageCarousel,
+    FullPreview
 }

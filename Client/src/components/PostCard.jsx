@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link} from 'react-router-dom';
-import {ModalPost} from "./index"
+import {ModalPost, ImageCarousel, FullPreview} from "./index"
 import myImg from "../images/Screenshot 2024-03-29 112144.png";
+import myImg1 from "../images/free-photo-of-red-cherries-in-bowl-and-basket.jpeg";
+import myImg2 from "../images/tanjiro_hinokami_kagura.jpg";
 
 function PostCard() {
     const postData = {
@@ -9,7 +11,7 @@ function PostCard() {
         avatar: 'https://google.com',
         name: 'Aryan Singh',
         username: 'aryansingh645',
-        postImage: myImg,
+        postImage: [myImg1, myImg, myImg2],
         techStack: ['React', 'Antd', 'Mongo DB', 'Firebase','gohoi','hhgaoag'],
         caption: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan',
         timeOfPost: '02:03 PM Apr 4, 2024',
@@ -19,10 +21,13 @@ function PostCard() {
         saved: true
     };
 
+
     const[isOpen, setIsOpen] = useState(false);
     const[isModalPostOpen, setIsModalPostOpen] = useState(false);
+    
 
     const myRef = useRef(null);
+
     useEffect(() => {
         const container = myRef.current;
         if(container.scrollHeight > container.clientHeight){
@@ -32,9 +37,10 @@ function PostCard() {
             setIsOpen(false);
         }
     },[postData])
+    
 
   return (
-    <div className='flex flex-col gap-2 w-[30rem] px-5 py-8 rounded-xl justify-evenly h-screen'>
+    <div className='flex flex-col gap-2 w-[32rem] px-5 py-8 rounded-xl justify-evenly h-screen'>
         <div className='flex gap-2 items-center'>
             <div>
                 {/* <img src={postData.avatar} alt="" /> */}
@@ -45,8 +51,9 @@ function PostCard() {
                 <p className='dark:text-white text-gray-800 font-semibold font-sans -mt-1'>@ {postData.username}</p>
             </div>
         </div> {/* avatar username */}
-        <div  className= {`flex justify-center h-[300px] bg-black`}>
-            <img className='rounded-xl object-contain' src={postData.postImage} alt="" />
+        
+        <div className= {`flex h-[320px] rounded-xl justify-center bg-black`}>
+            {postData.postImage.length > 1 ? <ImageCarousel postImages={postData.postImage} width={"w-[32rem]"} height={"h-[320px]"} /> : <img className='object-contain' src={postData.postImage[0]} alt="" />}
         </div> {/* post image */}
 
         <div className='flex hide-scrollbar gap-2 overflow-x-scroll'>
@@ -90,7 +97,7 @@ function PostCard() {
             }}></i>
         </div> {/* comments like and bookmark button */}
         <hr className='dark:bg-white bg-gray-700 h-[1.5px]' />
-        {isModalPostOpen && <ModalPost onClose ={() => {
+        {isModalPostOpen && <ModalPost postImagesArray={postData.postImage} onClose ={() => {
             document.body.style.overflowY = 'visible';
             setIsModalPostOpen(false);
             }}/>}

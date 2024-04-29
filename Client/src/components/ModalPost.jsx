@@ -1,16 +1,20 @@
 import React, { useRef, useState } from 'react';
 import {motion} from "framer-motion";
-import {LikesModalComp} from "./index.js"
+import ImageCarousel2 from './ImageCarousel2.jsx';
+import ImageCarousel3 from './ImageCarousel3.jsx';
+import {LikesModalComp, ImageCarousel} from "./index.js"
 import myImg from "../images/Screenshot 2024-03-29 112144.png";
+import myImg1 from "../images/free-photo-of-red-cherries-in-bowl-and-basket.jpeg";
+import myImg2 from "../images/tanjiro_hinokami_kagura.jpg";
 
-function ModalPost({onClose}) {
+function ModalPost({onClose, postImagesArray}) {
 
   const postData = {
     postId: '',
     avatar: 'https://google.com',
     name: 'Aryan Singh',
     username: 'aryansingh645',
-    postImage: myImg,
+    postImage: [myImg1, myImg, myImg2],
     techStack: ['React', 'Antd', 'Mongo DB', 'Firebase','gohoi','hhgaoag'],
     caption: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan',
     timeOfPost: '02:03 PM Apr 4, 2024',
@@ -90,15 +94,22 @@ const num = 1234555;
     <div 
     ref={overlayDivRef} 
     onClick={closeModal}
-    className='fixed inset-0 flex bg-opacity-10 backdrop-blur-sm bg-black dark:bg-white dark:bg-opacity-5 justify-center items-center'>
+    className='fixed inset-0 flex flex-col bg-opacity-10 backdrop-blur-sm bg-black dark:bg-white dark:bg-opacity-5 justify-center items-center'>
+      <div className='w-full flex justify-end px-8 -'>
+        <i onClick={onClose} className='bx bx-x dark:text-white text-gray-800 text-5xl cursor-pointer'></i>
+      </div>
       <motion.div 
       initial={{scale: 0}}
       animate={{scale: 1}}
-      className='flex justify-center items-center dark:bg-[#242526] bg-white rounded-lg w-[65rem] h-[40rem]'>
-        <div className='w-1/2'>
-          <img src={postData.postImage} alt="" srcset="" />
+      className='flex justify-center items-center dark:bg-[#242526] bg-white rounded-lg w-[65rem] h-[40rem] -mt-4'>
+
+        <div className='flex w-[55%] h-[40rem] rounded-xl justify-center items-center bg-black'>
+            <ImageCarousel3 postImagesArray={postImagesArray}/>
+          {/* <div className='flex justify-center items-center'> */}
+          {/* </div> */}
         </div> {/*Post Media Side*/}
-        <div className=' dark:bg-[#242526] bg-white hide-scrollbar w-1/2 overflow-y-scroll relative h-full px-0 pt-4 rounded-lg'>
+
+        <div className=' dark:bg-[#242526] bg-white [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 w-[45%] overflow-y-scroll relative h-full px-0 pt-4 rounded-lg'>
           <div className='flex gap-1 px-3 items-center'>
             <div className='rounded text-lg dark:text-white text-gray-800'>
               {/* <img src={postData.avatar} alt="" srcset="" /> */}
@@ -117,8 +128,8 @@ const num = 1234555;
           </div>
 
           <div className='flex flex-col px-3 dark:text-white text-gray-800'>
-            {postData.comments.map(commentData => (
-              <div className='my-2'>
+            {postData.comments.map((commentData, index) => (
+              <div key={index} className='my-2'>
               <span>
                 {/* <img src={} alt="" /> */}
                 <i className='bx bx-user'></i>
@@ -132,7 +143,7 @@ const num = 1234555;
             </div>
             ))}
           </div>{/*Comment*/}
-          <div className='sticky w-full px-3 py-1 pb-2 flex flex-col gap-2 bottom-0 dark:bg-[#242526] bg-white'>
+          <div className='sticky w-full px-3 py-1 pb-2 flex flex-col gap-2 -bottom-px dark:bg-[#242526] bg-white'>
             <hr />
             <div className='flex text-3xl justify-between dark:text-white text-gray-800'>
               <div className='flex gap-2'>
@@ -163,12 +174,10 @@ const num = 1234555;
           </div>{/*Likes && Add Comment*/}
         </div>{/*Caption, Comment and Likes Side*/}
       </motion.div>
-      <div>
-        <i onClick={onClose} className='bx bx-x absolute top-0 dark:text-white text-gray-800 text-5xl cursor-pointer'></i>
-      </div>
+      
       {isLikeModal && <LikesModalComp onClose ={() => {
-            setIsLikeModal(false);
-            }}/>}
+        setIsLikeModal(false);
+      }}/>}
     </div>
   )
 }
