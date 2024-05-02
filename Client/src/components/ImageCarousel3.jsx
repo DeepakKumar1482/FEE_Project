@@ -23,14 +23,14 @@ function NextArrow(props){
     )
 }
 
-function ImageCarousel3({postImagesArray}) {
+function ImageCarousel3({postImagesArray,height,width}) {
 
   return (
     <div className='w-full relative'>
-        <Carousel arrows prevArrow={<PrevArrow/>} nextArrow={<NextArrow/>} className='h-[40rem]'>
+        <Carousel arrows prevArrow={<PrevArrow/>} nextArrow={<NextArrow/>} className={`${height}`}>
             {postImagesArray.map((postImage, index) => (
                 <div className="flex justify-center items-center" key={index}>
-                    <div className="w-full h-[40rem]">
+                    <div className={`w-full ${height}`}>
                         <img className="h-full w-full object-contain" src={postImage} alt="" />
                     </div>
                 </div>

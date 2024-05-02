@@ -4,6 +4,7 @@ import {ModalPost, ImageCarousel, FullPreview} from "./index"
 import myImg from "../images/Screenshot 2024-03-29 112144.png";
 import myImg1 from "../images/free-photo-of-red-cherries-in-bowl-and-basket.jpeg";
 import myImg2 from "../images/tanjiro_hinokami_kagura.jpg";
+import ImageCarousel3 from './ImageCarousel3';
 
 function PostCard() {
     const postData = {
@@ -11,7 +12,7 @@ function PostCard() {
         avatar: 'https://google.com',
         name: 'Aryan Singh',
         username: 'aryansingh645',
-        postImage: [myImg1, myImg, myImg2],
+        postImage: [myImg, myImg2],
         techStack: ['React', 'Antd', 'Mongo DB', 'Firebase','gohoi','hhgaoag'],
         caption: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan',
         timeOfPost: '02:03 PM Apr 4, 2024',
@@ -53,7 +54,7 @@ function PostCard() {
         </div> {/* avatar username */}
         
         <div className= {`flex h-[320px] rounded-xl justify-center bg-black`}>
-            {postData.postImage.length > 1 ? <ImageCarousel postImages={postData.postImage} width={"w-[32rem]"} height={"h-[320px]"} /> : <img className='object-contain' src={postData.postImage[0]} alt="" />}
+            {postData.postImage.length > 1 ? <ImageCarousel3 postImagesArray={postData.postImage} width={"w-[32rem]"} height={"h-[320px]"} /> : <img className='object-contain' src={postData.postImage[0]} alt="" />}
         </div> {/* post image */}
 
         <div className='flex hide-scrollbar gap-2 overflow-x-scroll'>

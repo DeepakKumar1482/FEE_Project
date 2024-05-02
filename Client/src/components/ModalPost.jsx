@@ -94,7 +94,7 @@ const num = 1234555;
     <div 
     ref={overlayDivRef} 
     onClick={closeModal}
-    className='fixed inset-0 flex flex-col bg-opacity-10 backdrop-blur-sm bg-black dark:bg-white dark:bg-opacity-5 justify-center items-center'>
+    className='fixed z-50 inset-0 flex flex-col bg-opacity-10 backdrop-blur-sm bg-black dark:bg-white dark:bg-opacity-5 justify-center items-center'>
       <div className='w-full flex justify-end px-8 -'>
         <i onClick={onClose} className='bx bx-x dark:text-white text-gray-800 text-5xl cursor-pointer'></i>
       </div>
@@ -104,7 +104,7 @@ const num = 1234555;
       className='flex justify-center items-center dark:bg-[#242526] bg-white rounded-lg w-[65rem] h-[40rem] -mt-4'>
 
         <div className='flex w-[55%] h-[40rem] rounded-xl justify-center items-center bg-black'>
-            <ImageCarousel3 postImagesArray={postImagesArray}/>
+            <ImageCarousel3 postImagesArray={postImagesArray} height={"h-[40rem]"}/>
           {/* <div className='flex justify-center items-center'> */}
           {/* </div> */}
         </div> {/*Post Media Side*/}
