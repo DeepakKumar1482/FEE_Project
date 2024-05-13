@@ -83,11 +83,14 @@ function PostCard() {
         </div>{" "}
         {/* avatar username */}
         <div className={`flex h-[320px] rounded-xl justify-center bg-black`}>
-          {postdata.post[0].imageurls.length > 1 ? <ImageCarousel3
-            data={postdata.post[0].imageurls}
-            height={"h-[320px]"}
-          /> : <img src={postdata.post[0].imageurls[0]}/>}
-          
+          {postdata.post[0].imageurls.length > 1 ? (
+            <ImageCarousel3
+              data={postdata.post[0].imageurls}
+              height={"h-[320px]"}
+            />
+          ) : (
+            <img src={postdata.post[0].imageurls[0]} />
+          )}
         </div>{" "}
         {/* post image */}
         <div className="flex hide-scrollbar gap-2 overflow-x-scroll">
