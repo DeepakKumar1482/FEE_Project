@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { app } from "../Firebase/config.js";
 import {
   getAuth,
@@ -20,35 +20,9 @@ const Signup = () => {
   const googleauthProvider = new GoogleAuthProvider();
   const db = getAuth(app);
   const navigate = useNavigate();
-  const [LoginData, setLoginData] = useState("");
-  const [temp, settemp] = useState(0);
-  const [flag, setflag] = useState(false);
-  useEffect(() => {
-    if (temp > 0) {
-      SignupwithMail();
-    }
-    if (!flag) {
-      SetEmailPassword();
-    }
-    settemp(() => temp + 1);
-  }, [LoginData]);
-  const SetEmailPassword = async () => {
-    try {
-      const res = await axios.post(
-        "http://localhost:8080/api/user/createuser",
-        LoginData
-      );
-    } catch (e) {
-      console.log("error", e);
-    }
-  };
-  const signup = (values) => {
-    setLoginData(values.email);
-  };
-  const SignupwithMail = async () => {
+  const SignupwithMail = async (values) => {
     setloading(true);
-    console.log("This is logindata -> ", LoginData);
-    createUserWithEmailAndPassword(db, LoginData.email, LoginData.password)
+    createUserWithEmailAndPassword(db, values.email, values.password)
       .then(() => {
         message.success("Successfully Signedup");
         setloading(false);
@@ -56,7 +30,6 @@ const Signup = () => {
       })
       .catch((error) => {
         message.error("Email already exists");
-        setflag(true);
         setloading(false);
       });
   };
@@ -121,7 +94,7 @@ const Signup = () => {
       setloading(false);
     } catch (e) {
       setloading(false);
-      message.error("Please enter username and password");
+      message.error(e);
       console.log(e);
     }
   };

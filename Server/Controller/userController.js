@@ -9,6 +9,11 @@ const bcrypt = require('bcryptjs');
 const LogincheckController = async(req, res) => {
     try {
         const { username, password } = req.body;
+
+        // Initialize Firestore and reference to users collection
+        const db = getFirestore();
+        const usersRef = collection(db, 'users');
+
         // Check if the user exists
         const usernameQuery = query(usersRef, where("username", "==", username));
         const querySnapshot = await getDocs(usernameQuery);
@@ -25,19 +30,19 @@ const LogincheckController = async(req, res) => {
             const userData = doc.data();
             userPassword = userData.password;
         });
-        console.log('userPassword', userPassword);
-        console.log('entered password', password);
-        const ismatch = await bcrypt.compare(password, userPassword);
-        if (!ismatch) {
+
+        const isMatch = await bcrypt.compare(password, userPassword);
+        if (!isMatch) {
             return res.status(200).send({
                 success: false,
                 message: "Invalid password"
             });
         }
 
-        // If the password is correct, return a success message
-        const secretKey = "DeepakKumar1482"
-        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' })
+        // If the password is correct, generate a JWT token
+        const secretKey = "DeepakKumar1482"; // Replace with your actual secret key
+        const token = await jwt.sign({ id: username }, secretKey, { expiresIn: '6d' });
+
         res.status(200).send({
             success: true,
             message: 'Logged in',
@@ -45,14 +50,13 @@ const LogincheckController = async(req, res) => {
         });
 
     } catch (e) {
-        // If there's an error, return an internal server error message
+        console.log("This is error ", e);
         res.status(500).send({
             success: false,
             message: "Internal server error"
         });
-        console.log(e);
     }
-}
+};
 const newUserController = async(req, res) => {
 
     try {
