@@ -4,14 +4,13 @@ import myImg from "../images/Screenshot 2024-03-29 112144.png";
 import myImg1 from "../images/free-photo-of-red-cherries-in-bowl-and-basket.jpeg";
 
 function ImageCarousel({postImages, width, height}) {
-
+  console.log("This is from props -> ",postImages);
   // const [isFullPreview, setIsFullPreview] = useState(false);
   // const imgRef = useRef(null);
   // const [images, setImages] = useState(postImages);
   // if(images){
   //   console.log("yes");
   // }
-
   // const showFullPreview = (e) => {
   //   if(allowFullPreview == true){
   //     console.log("clicked");

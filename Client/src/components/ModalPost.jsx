@@ -7,76 +7,9 @@ import myImg from "../images/Screenshot 2024-03-29 112144.png";
 import myImg1 from "../images/free-photo-of-red-cherries-in-bowl-and-basket.jpeg";
 import myImg2 from "../images/tanjiro_hinokami_kagura.jpg";
 
-function ModalPost({onClose, postImagesArray}) {
-
-  const postData = {
-    postId: '',
-    avatar: 'https://google.com',
-    name: 'Aryan Singh',
-    username: 'aryansingh645',
-    postImage: [myImg1, myImg, myImg2],
-    techStack: ['React', 'Antd', 'Mongo DB', 'Firebase','gohoi','hhgaoag'],
-    caption: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan',
-    timeOfPost: '02:03 PM Apr 4, 2024',
-    gitHubRepo: 'https://github.com/',
-    comments : [
-      {
-        username: 'tyson007',
-        comment: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan'
-      },
-      {
-        username: 'tyson007',
-        comment: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan'
-      },
-      {
-        username: 'tyson007',
-        comment: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan'
-      },
-      {
-        username: 'tyson007',
-        comment: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan'
-      },
-      {
-        username: 'tyson007',
-        comment: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan'
-      },
-      {
-        username: 'tyson007',
-        comment: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. A, rem maiores dolorum possimus delectus necessitatibus nemo itaque libero voluptatem fugit loreanong bohghang  sdnjbgkkd  hoisgonn  agboan'
-      },
-  ],
-    likes: [
-        {
-        name: "Aryan Singh",
-        username: "tyson001"
-        },
-        {
-        name: "Aryan Singh",
-        username: "tyson002"
-        },
-        {
-        name: "Aryan Singh",
-        username: "tyson003"
-        },
-        {
-        name: "Aryan Singh",
-        username: "tyson004"
-        },
-        {
-        name: "Aryan Singh",
-        username: "tyson005"
-        },
-        {
-        name: "Aryan Singh",
-        username: "tyson006"
-        },
-        {
-        name: "Aryan Singh",
-        username: "tyson007"
-        },
-],
-    saved: true
-};
+function ModalPost({onClose,data}) {
+  console.log("This is from props -> ",data);
+  
 
 const overlayDivRef = useRef(null);
 
@@ -104,7 +37,7 @@ const num = 1234555;
       className='flex justify-center items-center dark:bg-[#242526] bg-white rounded-lg w-[65rem] h-[40rem] -mt-4'>
 
         <div className='flex w-[55%] h-[40rem] rounded-xl justify-center items-center bg-black'>
-            <ImageCarousel3 postImagesArray={postImagesArray} height={"h-[40rem]"}/>
+            <ImageCarousel3 data={data.imageurls} height={'h-[40rem]'}/>
           {/* <div className='flex justify-center items-center'> */}
           {/* </div> */}
         </div> {/*Post Media Side*/}
@@ -112,26 +45,25 @@ const num = 1234555;
         <div className=' dark:bg-[#242526] bg-white [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 w-[45%] overflow-y-scroll relative h-full px-0 pt-4 rounded-lg'>
           <div className='flex gap-1 px-3 items-center'>
             <div className='rounded text-lg dark:text-white text-gray-800'>
-              {/* <img src={postData.avatar} alt="" srcset="" /> */}
-              <i className='bx bx-user'></i>
+              <img className='w-10 h-10 rounded-full' src={data.avatar} alt="" srcset="" />
+              {/* <i className='bx bx-user'></i> */}
             </div>
             <div className='dark:text-white text-gray-800'>
-              <p>{postData.username}</p>
+              <p>@ {data.username}</p>
             </div>
           </div>
           <div className='dark:text-white px-3 text-gray-800'>
-            <p>{postData.caption}</p>
+            <p>{data.description}</p>
           </div>{/*Caption*/}
 
           <div className='px-3'>
             <hr className='my-4' />
           </div>
 
-          <div className='flex flex-col px-3 dark:text-white text-gray-800'>
-            {postData.comments.map((commentData, index) => (
-              <div key={index} className='my-2'>
+          {/* <div className='flex flex-col px-3 dark:text-white bg-purple-600 text-gray-800'>
+            {postData.comments.map(commentData => (
+              <div key={commentData} className='my-2'>
               <span>
-                {/* <img src={} alt="" /> */}
                 <i className='bx bx-user'></i>
               </span>
               <span className='font-bold mr-1'>
@@ -142,8 +74,8 @@ const num = 1234555;
               </span>
             </div>
             ))}
-          </div>{/*Comment*/}
-          <div className='sticky w-full px-3 py-1 pb-2 flex flex-col gap-2 -bottom-px dark:bg-[#242526] bg-white'>
+          </div> */}
+          <div className='sticky w-full px-3 py-1 pb-2 flex flex-col gap-2 bottom-0 dark:bg-[#242526] bg-white'>
             <hr />
             <div className='flex text-3xl justify-between dark:text-white text-gray-800'>
               <div className='flex gap-2'>

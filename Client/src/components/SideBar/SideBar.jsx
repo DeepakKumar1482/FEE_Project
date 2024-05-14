@@ -26,7 +26,7 @@ function SideBar() {
     }, 
     {
       name: 'Add Post',
-      slug: '/add-post',
+      slug: 'add-post',
       icon: 'plus-circle'
     }, 
     {
@@ -174,7 +174,7 @@ function SideBar() {
         </ul>
         <div className='absolute bottom-2 w-full px-2'>
           <NavLink 
-          to='/layout'
+          to='/'
           className={({isActive}) => 
           `flex flex-row items-center  h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] ${isActive? "text-gray-500" : "text-gray-800"}`}
           >

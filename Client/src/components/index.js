@@ -6,6 +6,7 @@ import Footer from "./Footer/Footer";
 import LikesModalComp from "./LikesModalComp";
 import ImageCarousel from "./ImageCarousel";
 import FullPreview from "./FullPreview";
+import ParticlesComponent from "./ParticlesComponent";
 
 export{
     Button,
@@ -15,5 +16,6 @@ export{
     Footer,
     LikesModalComp,
     ImageCarousel,
-    FullPreview
+    FullPreview,
+    ParticlesComponent
 }

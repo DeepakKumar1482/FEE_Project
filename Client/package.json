@@ -11,6 +11,8 @@
     },
     "dependencies": {
         "@reduxjs/toolkit": "^2.2.3",
+        "@tsparticles/react": "^3.0.0",
+        "@tsparticles/slim": "^3.3.0",
         "antd": "^5.16.0",
         "axios": "^1.6.8",
         "firebase": "^10.10.0",

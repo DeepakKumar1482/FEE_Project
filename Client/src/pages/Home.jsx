@@ -6,7 +6,6 @@ function Home() {
     <div className=''>
         <PostCard/>
         <PostCard/>
-        <PostCard/>
     </div>
   )
 }
