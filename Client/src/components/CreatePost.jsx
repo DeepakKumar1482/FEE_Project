@@ -100,12 +100,12 @@ const CreatePost = () => {
     'Natural Language Processing (NLP)','Robotics','Internet of Things (IoT)','AR/VR (Augmented Reality/Virtual Reality)','UI/UX Design','Responsive Web Design','Progressive Web Apps (PWAs)'];
   Tech.sort();
   return (
-    <div className='w-full h-auto'>
+    <div className='w-full h-full'>
       <div className='w-full px-40 h-full overflow-auto'>
         {/* Image upload section */}
-        <div className='w-full h-80 pt-5'>
+        <div className='w-full h-fit pt-5'>
           <div className='w-full h-full flex justify-center items-center bg-orange-50 border border-dotted rounded-t-md'>
-            <label className='h-full w-full p-4 flex justify-center' htmlFor="file-input">
+            <label className='h-[300px] w-full p-4 flex justify-center' htmlFor="file-input">
               {selectedImages.length > 0 ? (
                 <div className={`grid grid-cols-${Math.min(2, selectedImages.length)} gap-4 overflow-auto`}>
                 {selectedImages.map((image, index) => (
@@ -131,7 +131,7 @@ const CreatePost = () => {
         {/* Form section */}
         <div className='w-full h-auto pb-10'>
           <div className='w-full h-4/5 border overflow-hidden border-gray-300 rounded-b-md'>
-            <textarea onChange={(e) => setDescription(e.target.value)} style={{ resize: "none", outline: "none" }} className='w-full h-full p-2' placeholder='Write your post.......' name="" id="" cols="30" rows="10"></textarea>
+            <textarea onChange={(e) => setDescription(e.target.value)} style={{ resize: "none", outline: "none" }} className='w-full h-full p-2' placeholder='Write your post.......' name="" id="" cols="30" rows="5"></textarea>
           </div>
           <Form onFinish={handleSubmit} className='mt-5'>
             <Form.Item name='githubRepo'>

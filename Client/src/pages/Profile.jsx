@@ -8,6 +8,7 @@ import Formbackground from '../assets/Formbackground.jpg'
 const { Option } = Select;
 import {useNavigate} from 'react-router-dom'
 import Loader from '../components/Loader/loader';
+import {ParticlesComponent} from "../components"
 const Profile = () => {
   const navigate=useNavigate();
   const [selectedimage, setSelectedImage] = useState(null);
@@ -139,71 +140,110 @@ const Profile = () => {
     setval(values);
   }
   return (
-    <div className='h-screen w-screen flex' style={{backgroundImage: `url(${Formbackground})`, backgroundSize: 'cover'}}>
-      <div  className='h-auto lg:w-2/3 w-full  rounded-md lg:overflow-hidden flex-col md:ml-5 mx-2'>
-          <div className='lg:h-1/6 lg:w-4/5 lg:mt-10 lg:ml-10 flex justify-center items-end pt-5'>
-            <label htmlFor="file-input" className="h-20 w-20 flex items-center justify-center">
-              {selectedimage ?
-                <img className='h-full w-full object-cover rounded-full hover:cursor-pointer' src={URL.createObjectURL(selectedimage)} alt="Selected Image" /> :
-                <span className='text-6xl p-2 text-white hover:cursor-pointer relative border  rounded-full flex items-center justify-center'>
-                  <i className='bx bx-user-plus'></i>
-                </span>
-              }
-            </label>
-            <input
-              id="file-input"
-              type="file"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </div>
-          <div className='lg:h-5/6 lg:w-4/5 lg:mt-10 lg:ml-10  flex justify-center'>
-            <Form onFinish={callBoth} className='p-16  rounded-md w-full h-4/5 flex flex-col px-10 justify-center'>
-              <Form.Item name='name' className=''>
-                <Input placeholder='Name' />
-              </Form.Item>
-              <Form.Item name='username' className=''>
-                <Input onChange={(e) => setUserName(e.target.value)} placeholder='Username' />
-              </Form.Item>
-              <Form.Item name='password' className=''>
-                <Input.Password type='password' placeholder='Password' />
-              </Form.Item>
-              <Form.Item name='university' className=''>
-                <Select mode='single' className='w-full' placeholder='University'>
-                  {
-                    // universities.map((key,university)=>{
-                    //   return <Option key={key} value={university[key]}>{university[key]}</Option>
-                    // })
-                    universities.map((university )=> (
-                      <Option key={university} value={university}>{university}</Option>
-                    ))
-                  }
-                </Select>
-              </Form.Item>
-              <Form.Item name='techStack' className=''>
-                <Select mode='multiple' className='w-full' placeholder='Technologies'>
-                  {techStack.map((techStack )=> (
-                    <Option key={techStack} value={techStack}>{techStack}</Option>
-                  ))
-                }
-                </Select>
-              </Form.Item>
-              <div className='h-full w-full'>
-              <button className=' w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-5 transition ease-in-out duration-500 text-center' onClick={githubAuthentication}>
-                <span className=' flex justify-center items-center gap-x-2'><i className='bx bxl-github text-xl'></i>Authenticate with Github</span></button>
-              </div>
-            <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition ease-in-out duration-500' type="submit">Join now</button>
-            </Form>
-          </div>
+    <div>
+      <ParticlesComponent />
+      <div className="h-screen w-screen flex justify-center items-center">
+      <div className='flex w-full h-full justify-center items-center pr-8'>
+        <iframe className='z-10 w-1/2 h-full' src="https://lottie.host/embed/66a1ffad-f057-495a-a0eb-2d1baf3fb430/lF5aT9FYcp.json"></iframe>        
+        <div className="h-fit w-[38rem] z-10 rounded-md flex flex-col backdrop-blur-sm bg-black/30 items-center justify-center mx-2 gap-6 border-[1px] py-6">
+            <div className="w-full flex justify-center items-end">
+              <label
+                htmlFor="file-input"
+                className="h-20 w-20 flex items-center justify-center"
+              >
+                {selectedimage ? (
+                  <img
+                    className="h-full z-10 w-full object-cover rounded-full hover:cursor-pointer"
+                    src={URL.createObjectURL(selectedimage)}
+                    alt="Selected Image"
+                  />
+                ) : (
+                  <span className="text-6xl p-2 text-white hover:cursor-pointer relative border  rounded-full flex items-center justify-center">
+                    <i className="bx bx-user-plus"></i>
+                  </span>
+                )}
+              </label>
+              <input
+                id="file-input"
+                type="file"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+            <div className="w-full flex justify-center">
+              <Form
+                onFinish={callBoth}
+                className="rounded-md w-full flex flex-col px-10 justify-center"
+              >
+                <Form.Item name="name" className="">
+                  <Input
+                    className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
+                    placeholder="Name"
+                  />
+                </Form.Item>
+                <Form.Item name="username" className="">
+                  <Input
+                    className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
+                    onChange={(e) => setUserName(e.target.value)}
+                    placeholder="Username"
+                  />
+                </Form.Item>
+                <Form.Item name="password" className="">
+                  <Input
+                    className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
+                    type="password"
+                    placeholder="Password"
+                  />
+                </Form.Item>
+                <Form.Item name="university" className="">
+                  <Select mode="single" className="w-full custom-select" placeholder="University">
+                    {
+                      universities.map((university) => (
+                        <Option key={university} value={university}>
+                          {university}
+                        </Option>
+                      ))
+                    }
+                  </Select>
+                </Form.Item>
+                <Form.Item name="techStack" className="">
+                  <Select
+                    mode="multiple"
+                    className="w-full appearance-none bg-transparent text-red-500"
+                    placeholder="Technologies"
+                  >
+                    {techStack.map((techStack) => (
+                      <Option key={techStack} value={techStack}>
+                        {techStack}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <div className="h-full w-full z-10">
+                  <button
+                    className=" w-full bg-[#695CFE] hover:bg-[#574cd0] text-white font-bold py-2 px-4 rounded mb-5 transition ease-in-out duration-500 text-center"
+                    onClick={githubAuthentication}
+                  >
+                    <span className=" flex justify-center items-center gap-x-2">
+                      <i className="bx bxl-github text-xl"></i>Authenticate with
+                      Github
+                    </span>
+                  </button>
+                </div>
+                <button
+                  className="bg-[#695CFE] hover:bg-[#574cd0] text-white font-bold py-2 px-4 rounded transition ease-in-out duration-500 z-10"
+                  type="submit"
+                >
+                  Join now
+                </button>
+              </Form>
+            </div>
+        </div>
       </div>
-      <div className='w-1/2 h-auto lg:flex hidden justify-end items-end'>
-        <img src={SideImage} className='h-auto w-auto' />
+        {loading && <Loader />}
       </div>
-      {
-        loading && <Loader />
-      }
     </div>
-  )
+  );
 };
 
 export default Profile;

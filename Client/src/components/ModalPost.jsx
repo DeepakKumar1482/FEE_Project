@@ -27,9 +27,9 @@ const num = 1234555;
     <div 
     ref={overlayDivRef} 
     onClick={closeModal}
-    className='fixed z-50 inset-0 flex flex-col bg-opacity-10 backdrop-blur-sm bg-black dark:bg-white dark:bg-opacity-5 justify-center items-center'>
+    className='fixed z-50 inset-0 flex flex-col bg-opacity-10 bg-black dark:bg-white dark:bg-opacity-5 justify-center items-center'>
       <div className='w-full flex justify-end px-8 -'>
-        <i onClick={onClose} className='bx bx-x dark:text-white text-gray-800 text-5xl cursor-pointer'></i>
+        <i onClick={onClose} className='bx bx-x text-white text-5xl cursor-pointer'></i>
       </div>
       <motion.div 
       initial={{scale: 0}}

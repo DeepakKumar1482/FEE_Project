@@ -1,0 +1,126 @@
+
+#logo{
+    fill: none;
+    animation: fill 0.5s ease forwards 3.5s;
+    /* animation: boxclose 1.5s ease forwards 3.5s; */
+}
+
+#logo path:nth-child(1){
+    stroke-dasharray: 200px;
+    stroke-dashoffset: 200px;
+    animation: anim-line 2s ease forwards ;
+}
+#logo path:nth-child(2){
+    stroke-dasharray: 200px;
+    stroke-dashoffset: 200px;
+    animation: anim-line 2s ease forwards 0.3s;
+}   
+#logo path:nth-child(3){
+    stroke-dasharray: 200px;
+    stroke-dashoffset: 200px;
+    animation: anim-line 2s ease forwards 0.6s;
+
+}
+#logo path:nth-child(4){
+    stroke-dasharray: 200px;
+    stroke-dashoffset: 200px;
+    animation: anim-line 2s ease forwards 0.9s;
+}
+#logo path:nth-child(5){
+    stroke-dasharray: 200px;
+    stroke-dashoffset: 200px;
+    animation: anim-line 2s ease forwards 1.2s;
+}
+#logo path:nth-child(6){
+    stroke-dasharray: 200px;
+    stroke-dashoffset: 200px;
+    animation: anim-line 2s ease forwards 1.5s;
+}
+#logo path:nth-child(7){
+    stroke-dasharray: 200px;
+    stroke-dashoffset: 200px;
+    animation: anim-line 2s ease forwards 1.8s;
+
+}
+#logo path:nth-child(8){
+    stroke-dasharray: 200px;
+    stroke-dashoffset: 200px;
+    animation: anim-line 2s ease forwards 2.1s;
+}
+#logo path:nth-child(9){
+    stroke-dasharray: 200px;
+    stroke-dashoffset: 200px;
+    animation: anim-line 2s ease forwards 2.4s;
+}
+
+#loginbox > * {
+    animation: boxopen 1s ease forwards;
+    transform-origin: center;
+}
+
+.userForm {
+    opacity: 0;
+    animation: formVisible 0.2s ease forwards 1s;
+}
+
+#headingText{
+    animation: formVisible 2s ease forwards;
+    transform-origin: center;
+}
+
+@keyframes boxclose{
+    80%{
+        width: 0;
+    }
+    100%{
+        opacity: 0;
+        display: none;
+    }
+}
+
+@keyframes leftOpen{
+    from{
+        width: 0;
+    }
+    to{
+        width: fit-content
+    }
+}
+
+@keyframes boxopen{
+    from{
+        height: 0%;
+    }
+    to{
+        height: 100%;
+    }
+}
+
+@keyframes formVisible{
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}
+
+@keyframes anim-line {
+    to{
+        stroke-dashoffset: 0;
+    }
+}
+@keyframes fill {
+    0%{
+        fill: transparent;;
+    }
+    100%{
+        fill: #695CFE;
+    }
+}
+@keyframes inVisible{
+    to{
+        height: 0;
+        display: none;
+    }
+}

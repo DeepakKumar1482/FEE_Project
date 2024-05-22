@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { app } from "../Firebase/config.js";
 import {
   getAuth,
@@ -13,10 +13,12 @@ import { useParams } from "react-router-dom";
 import Loader from "../components/Loader/loader.jsx";
 import axios from "axios";
 import {ParticlesComponent} from "../components"
+import {TextLoader} from "./"
 
 const Signup = () => {
   const param = useParams();
   const [loading, setloading] = useState(false);
+  const [isTextLoader, setIsTextLoader] = useState(true);
   const googleauthProvider = new GoogleAuthProvider();
   const db = getAuth(app);
   const navigate = useNavigate();
@@ -99,57 +101,59 @@ const Signup = () => {
     }
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      setIsTextLoader(false);
+    },6000)
+  },[])
+
   return (
     <div>
       <ParticlesComponent/>
+      {isTextLoader ? <TextLoader/> : 
       <div className="h-screen w-screen flex flex-col bg-[#242526] justify-center items-center text-center">
-        <div className="z-10 ">
-          <h1 className="text-4xl bg-white/10 backdrop-blur-sm rounded-lg p-2 text-[#695CFE] font-[550] mb-20 mt-10">CODEBUDDY</h1>
+        <div id="headingText" className="z-10">
+          <h1 className="text-4xl bg-white/10 backdrop-blur-sm rounded-lg p-2 text-[#695CFE] font-[550] mb-12 mt-10">CODEBUDDY</h1>
         </div>
-        <div className="flex justify-center items-center w-full h-full mb-10">
-          {/* <div className="z-10">
-            <iframe
-              className=""
-              width={"500px"}
-              height={"500px"}
-              src="https://lottie.host/embed/4e17d12d-4854-4853-9af5-6cc422efb7c7/RkWVXKVPNq.json"
-            ></iframe>
-          </div> */}
-          <div className="w-fit flex justify-center backdrop-blur-sm bg-black/30 h-full">
-            <div className="w-96 h-auto pb-5 bgpu6 px-10 shadow-lg  rounded-md border border-gray-300">
+        <div id="loginbox" className="flex justify-center items-center w-full h-full mb-10">
+          <div  className="w-fit flex justify-center backdrop-blur-sm bg-black/30 h-full">
+            <div className="w-96 h-auto pb-5 px-10 shadow-lg rounded-md border border-gray-300">
               {param.signup == "signup" ? (
-                <div className="">
-                  <Form onFinish={signup} className="pt-10 w-72">
+                <div className="flex flex-col justify-center items-center gap-6 h-full">
+                  <Form onFinish={Signup} className="pt-10 w-72 ">
                     <Form.Item name="email">
-                      <Input className="" placeholder="Email" />
+                      <Input className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg" placeholder="Email" />
                     </Form.Item>
                     <Form.Item name="password">
-                      <Input placeholder="Password" />
+                      <Input className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg" placeholder="Password" />
                     </Form.Item>
                     <button
                       type="submit"
-                      className="w-full h-11 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4 transition ease-in-out duration-500"
+                      className="w-full h-11 flex items-center justify-center bg-[#695CFE] hover:bg-[#574cd0] active:bg-[#574cd0] active:scale-95 duration-150 text-white text-base font-semibold py-2 gap-2 px-4 mb-4 rounded-lg"
                     >
-                      Signup with mail
+                      <p> Signup with Mail </p>
+                      <i className="bx bx-envelope text-2xl"></i>
+                      
                     </button>
                   </Form>
                   <button
                     onClick={signupWithGoogle}
-                    className="w-full text-black flex justify-center items-center gap-x-4 shadow-md hover:bg-gray-200 transition ease-in-out duration-500 font-bold py-2 px-4 rounded mb-1"
+                    className="w-72 h-11 text-white flex justify-center items-center gap-x-2 shadow-md hover:bg-white/30 font-semibold py-2 rounded mb-1"
                   >
                     Signup with Google
-                    <img className="w-7 h-7" src={Google} alt="" />
+                    <i className="bx bxl-google text-2xl"></i>
+                    {/* <img className="w-5 h-5" src={Google} alt="" /> */}
                   </button>
                 </div>
               ) : (
-                <Form onFinish={signin} className="pt-10 w-full h-full flex flex-col justify-center -mt-10">
+                <Form onFinish={signin} className="pt-10 w-full h-full flex flex-col justify-center -mt-10 userForm">
                   <Form.Item  name="username">
-                    <Input className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base" placeholder="Username" />
+                    <Input className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg" placeholder="Username" />
                   </Form.Item>
                   <Form.Item name="password">
-                    <Input className="bg-transparent focus:bg-transparent hover:bg-transparent focus-within:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base" type="password" placeholder="Password" />
+                    <Input className="bg-transparent focus:bg-transparent hover:bg-transparent focus-within:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg" type="password" placeholder="Password" />
                   </Form.Item>
-                  <button className="w-full h-11 bg-[#695CFE] hover:bg-blue-600 text-white font- py-2 px-4 mb-4 rounded transition ease-in-out duration-500">
+                  <button className="w-full h-11 bg-[#695CFE] hover:bg-[#574cd0] active:bg-[#574cd0] active:scale-95 duration-150 text-white font- py-2 px-4 mb-4 rounded-lg font-semibold text-base">
                     Login
                   </button>
                 </Form>
@@ -157,7 +161,7 @@ const Signup = () => {
               {param.signup == "signin" && (
                 <Link
                   to={"/signup"}
-                  className="text-blue-200 transition ease-in-out duration-500 hover:text-blue-400"
+                  className="text-blue-200 hover:text-blue-400 userForm" 
                 >
                   Don't have an account?{" "}
                 </Link>
@@ -166,7 +170,7 @@ const Signup = () => {
           </div>
         </div>
         {loading && <Loader />}
-      </div>
+      </div>}
     </div>
   );
 };

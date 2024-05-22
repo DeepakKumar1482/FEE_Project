@@ -6,7 +6,7 @@ import {
   ImageCarousel,
   FullPreview,
 } from "./components";
-import { Signup, Home, Profile } from "./pages";
+import { Signup, Home, Profile, TextLoader } from "./pages";
 import Layout from "./Layout";
 import CreatePost from "./components/CreatePost";
 import ProtectedRoutes from "./components/ProtectedRoutes/Protected";
