@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Pusher from "pusher-js";
 import axios from "axios";
 
