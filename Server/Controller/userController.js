@@ -181,27 +181,24 @@ const pusher = new Pusher({
 
 const MessageController = (req, res) => {
     try {
-        // Extract recipient and message from the request body
         const { recipient, message } = req.body;
-
-        // Extract sender from the request (ensure req.userName is set correctly)
         const sender = req.userName;
 
         console.log(`Received message from ${sender} to ${recipient}: ${message}`);
 
-        // Check if sender and recipient are not empty
         if (!sender || !recipient || !message) {
             return res.status(400).send({ success: false, message: 'Invalid data' });
         }
 
-        // Trigger Pusher event to broadcast the message
-        pusher.trigger('chat', 'message', {
+        // Trigger Pusher event for the recipient's personal channel
+        pusher.trigger(`user-${recipient}`, 'new-message', {
             sender,
             recipient,
-            message
+            message,
+            timestamp: new Date().toISOString()
         });
 
-        console.log(`Message sent to Pusher: ${message}`);
+        console.log(`Message sent to Pusher channel user-${recipient}`);
 
         res.status(200).send({ success: true, message: 'Message sent' });
     } catch (err) {
