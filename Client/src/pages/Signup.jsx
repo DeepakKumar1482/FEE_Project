@@ -101,7 +101,7 @@ const Signup = () => {
         localStorage.setItem("token", res.data.token);
         navigate("/");
       } else {
-        message.error(res.data.message);
+        message.error(res.data.message, 4);
       }
       setloading(false);
     } catch (e) {

@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Pusher from "pusher-js";
 import axios from "axios";
 
 const Message = () => {
-  const [recipient, setRecipient] = useState(""); // Recipient username
-  const [message, setMessage] = useState(""); // Message to be sent
-  const [messages, setMessages] = useState({}); // All messages, grouped by conversation
-  const [currentUser, setCurrentUser] = useState(""); // Current user's username
+  const [recipient, setRecipient] = useState("");
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState({});
+  const [currentUser, setCurrentUser] = useState("");
+  const [notificationCount, setNotificationCount] = useState(0);
   const pusherRef = useRef(null);
 
   async function parseJwt(token) {
@@ -35,12 +36,9 @@ const Message = () => {
 
       if (token) {
         const decodedToken = await parseJwt(token);
-        console.log("This is decoded token -> ", decodedToken);
 
         if (decodedToken && decodedToken.id) {
-          const username = decodedToken.id;
-          console.log("This is user name -> ", username);
-          setCurrentUser(username);
+          setCurrentUser(decodedToken.id);
         } else {
           console.error("No ID found in the token.");
         }
@@ -63,7 +61,6 @@ const Message = () => {
 
   useEffect(() => {
     if (currentUser) {
-      // Subscribe to the user's personal channel
       const channel = pusherRef.current.subscribe(`user-${currentUser}`);
 
       channel.bind("new-message", (data) => {
@@ -71,6 +68,10 @@ const Message = () => {
           ...prevMessages,
           [data.sender]: [...(prevMessages[data.sender] || []), data],
         }));
+
+        if (data.sender !== recipient) {
+          setNotificationCount((prevCount) => prevCount + 1);
+        }
       });
 
       return () => {
@@ -78,7 +79,13 @@ const Message = () => {
         channel.unsubscribe();
       };
     }
-  }, [currentUser]);
+  }, [currentUser, recipient]);
+
+  useEffect(() => {
+    if (messages[recipient]) {
+      setNotificationCount(0);
+    }
+  }, [recipient, messages]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -87,10 +94,7 @@ const Message = () => {
       try {
         await axios.post(
           "http://localhost:8080/api/user/message",
-          {
-            recipient,
-            message,
-          },
+          { recipient, message },
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token"),
@@ -98,7 +102,6 @@ const Message = () => {
           }
         );
 
-        // Add the sent message to the local state
         setMessages((prevMessages) => ({
           ...prevMessages,
           [recipient]: [
@@ -107,7 +110,7 @@ const Message = () => {
           ],
         }));
 
-        setMessage(""); // Clear the message input field
+        setMessage("");
       } catch (error) {
         console.error("Error sending message", error);
       }
@@ -124,6 +127,11 @@ const Message = () => {
           onChange={(e) => setRecipient(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
         />
+        {notificationCount > 0 && (
+          <span className="ml-2 bg-red-500 text-white text-xs font-semibold py-1 px-2 rounded-full">
+            {notificationCount}
+          </span>
+        )}
       </div>
       <div className="h-96 overflow-y-auto mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
         {!recipient ||

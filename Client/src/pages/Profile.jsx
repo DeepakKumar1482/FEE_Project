@@ -11,8 +11,7 @@ import Loader from "../components/Loader/loader";
 import { ParticlesComponent } from "../components";
 const Profile = () => {
   const navigate = useNavigate();
-  const [selectedimage, setSelectedImage] = useState(null);
-  const [imageurl, setImageUrl] = useState("");
+  // const [imageurl, setImageUrl] = useState("");
   const [githubName, setGithubName] = useState(null);
   const [userName, setUserName] = useState(null);
   const [isUserExist, setIsUserExist] = useState(0);
@@ -20,6 +19,7 @@ const Profile = () => {
   const [temp, settemp] = useState(0);
   const [flag, setflag] = useState(0);
   const [loading, setloading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const universities = [
     "IIT Bombay",
     "IIT Delhi",
@@ -99,33 +99,6 @@ const Profile = () => {
     "Kubernetes",
   ];
   techStack.sort();
-  useEffect(() => {
-    if (temp > 0) {
-      formData(val);
-    }
-    settemp(() => temp + 1);
-  }, [imageurl]);
-  const handleFileChange = (event) => {
-    setSelectedImage(event.target.files[0]);
-  };
-
-  const cloudinaryUpload = async () => {
-    setloading(true);
-    const data = new FormData();
-    data.append("file", selectedimage);
-    data.append("upload_preset", "codebuddy");
-    data.append("cloud_name", "dhrahulpp");
-    await axios
-      .post("https://api.cloudinary.com/v1_1/dhrahulpp/image/upload", data)
-      .then((response) => {
-        const url = response.data.secure_url;
-        setImageUrl(url);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   const provider = new GithubAuthProvider();
   const auth = getAuth(app);
 
@@ -148,63 +121,41 @@ const Profile = () => {
     }
   };
 
-  const formData = async (values) => {
+  const handleFileChange = (event) => {
+    setSelectedImage(event.target.files[0]);
+  };
+  const formData = new FormData();
+  formData.append("image", selectedImage);
+  formData.append("githubName", githubName);
+
+  const uploaduser = async (values, e) => {
+    formData.append("name", values.name);
+    formData.append("username", values.username);
+    formData.append("password", values.password);
+    formData.append("university", values.university);
+    // name, username, password, university, techStack
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/user/createuser",
-        { githubName, imageurl, ...values }
+        "http://localhost:8080/api/user/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       if (res.data.success) {
         localStorage.setItem("token", res.data.token);
-        message.success(res.data.message);
+        console.log(res.data.token);
+        message.success("Saved");
         navigate("/");
       } else {
         message.error(res.data.message);
       }
-      setloading(false);
     } catch (e) {
       console.log(e);
     }
-  };
-
-  const UserExist = async (username) => {
-    try {
-      const res = await axios.post(
-        "http://localhost:8080/api/user/isUserExist",
-        { user: username }
-      );
-      if (res.data.success === false) {
-        message.error("Username already taken");
-        setIsUserExist(0);
-      } else {
-        setIsUserExist(res.data.data);
-        console.log(res.data.data);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  useEffect(() => {
-    if (flag > 0 && isUserExist != 0) {
-      if (githubName == null) {
-        message.error("Please Sign in with Github");
-        return;
-      }
-      if (selectedimage != null) {
-        cloudinaryUpload();
-      } else {
-        message.error("Please upload image");
-        return;
-      }
-    }
-    setflag(() => flag + 1);
-  }, [isUserExist]);
-  const callBoth = async (values) => {
-    await UserExist(userName);
-    if (isUserExist == true) {
-      return;
-    }
-    setval(values);
+    e.preventDefault();
   };
   return (
     <div>
@@ -221,10 +172,10 @@ const Profile = () => {
                 htmlFor="file-input"
                 className="h-20 w-20 flex items-center justify-center"
               >
-                {selectedimage ? (
+                {selectedImage ? (
                   <img
                     className="h-full z-10 w-full object-cover rounded-full hover:cursor-pointer"
-                    src={URL.createObjectURL(selectedimage)}
+                    src={URL.createObjectURL(selectedImage)}
                     alt="Selected Image"
                   />
                 ) : (
@@ -234,6 +185,7 @@ const Profile = () => {
                 )}
               </label>
               <input
+                name="image"
                 id="file-input"
                 type="file"
                 onChange={handleFileChange}
@@ -242,7 +194,7 @@ const Profile = () => {
             </div>
             <div className="w-full flex justify-center">
               <Form
-                onFinish={callBoth}
+                onFinish={uploaduser}
                 className="rounded-md w-full flex flex-col px-10 justify-center"
               >
                 <Form.Item name="name" className="">
