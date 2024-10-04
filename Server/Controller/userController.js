@@ -6,6 +6,8 @@ const postsRef = collection(app, "posts");
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const Pusher = require("pusher");
+
 const LogincheckController = async(req, res) => {
     try {
         const { username, password } = req.body;
@@ -169,10 +171,50 @@ const CreatePostController = async(req, res) => {
         })
     }
 }
+const pusher = new Pusher({
+    appId: "1848765",
+    key: "abee743b1c2ab29528ad",
+    secret: "611406db68cb01640e40",
+    cluster: "ap2",
+    useTLS: true
+});
+
+const MessageController = (req, res) => {
+    try {
+        // Extract recipient and message from the request body
+        const { recipient, message } = req.body;
+
+        // Extract sender from the request (ensure req.userName is set correctly)
+        const sender = req.userName;
+
+        console.log(`Received message from ${sender} to ${recipient}: ${message}`);
+
+        // Check if sender and recipient are not empty
+        if (!sender || !recipient || !message) {
+            return res.status(400).send({ success: false, message: 'Invalid data' });
+        }
+
+        // Trigger Pusher event to broadcast the message
+        pusher.trigger('chat', 'message', {
+            sender,
+            recipient,
+            message
+        });
+
+        console.log(`Message sent to Pusher: ${message}`);
+
+        res.status(200).send({ success: true, message: 'Message sent' });
+    } catch (err) {
+        console.error('Error in MessageController:', err);
+        res.status(500).send({ success: false, message: 'Internal server error' });
+    }
+};
+
 module.exports = {
     newUserController,
     IsUserExist,
     CreatePostController,
     LogincheckController,
-    LogincheckController
+    LogincheckController,
+    MessageController
 };

@@ -11,6 +11,7 @@ import Layout from "./Layout";
 import CreatePost from "./components/CreatePost";
 import ProtectedRoutes from "./components/ProtectedRoutes/Protected";
 import PublicRoute from "./components/ProtectedRoutes/Public";
+import Message from "./components/Message";
 function App() {
   return (
     <Router>
@@ -43,6 +44,7 @@ function App() {
         >
           <Route index element={<Home />} />
           <Route path="add-post" element={<CreatePost />} />
+          <Route path="/messages" element={<Message />} />
         </Route>
       </Routes>
     </Router>
