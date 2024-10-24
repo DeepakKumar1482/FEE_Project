@@ -12,6 +12,7 @@ import CreatePost from "./components/CreatePost";
 import ProtectedRoutes from "./components/ProtectedRoutes/Protected";
 import PublicRoute from "./components/ProtectedRoutes/Public";
 import Message from "./components/Message";
+import { SocketContextProvider } from "./context/Socket";
 function App() {
   return (
     <Router>
@@ -38,11 +39,13 @@ function App() {
           path="/"
           element={
             <ProtectedRoutes>
-              <Layout />
+              <SocketContextProvider>
+                <Layout />
+              </SocketContextProvider>
             </ProtectedRoutes>
           }
         >
-          <Route index element={<Home />} />
+          <Route index path="/" element={<Home />} />
           <Route path="add-post" element={<CreatePost />} />
           <Route path="/messages" element={<Message />} />
         </Route>

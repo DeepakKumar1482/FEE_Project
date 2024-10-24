@@ -9,8 +9,10 @@ const { Option } = Select;
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader/loader";
 import { ParticlesComponent } from "../components";
+import { useSocket } from "../context/socket";
 const Profile = () => {
   const navigate = useNavigate();
+  const {username, setUsername} = useSocket();
   const [selectedimage, setSelectedImage] = useState(null);
   const [imageurl, setImageUrl] = useState("");
   const [githubName, setGithubName] = useState(null);
@@ -131,6 +133,7 @@ const Profile = () => {
 
   const githubAuthentication = async (e) => {
     e.preventDefault(); // Prevent form submission
+    console.log("first")
     if (githubName == null) {
       await signInWithPopup(auth, provider)
         .then((result) => {
@@ -178,6 +181,8 @@ const Profile = () => {
         setIsUserExist(0);
       } else {
         setIsUserExist(res.data.data);
+        setUsername(userName);
+        localStorage.setItem("username", username);
         console.log(res.data.data);
       }
     } catch (err) {
@@ -255,6 +260,7 @@ const Profile = () => {
                   <Input
                     className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
                     onChange={(e) => setUserName(e.target.value)}
+                    value={username}
                     placeholder="Username"
                   />
                 </Form.Item>

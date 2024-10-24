@@ -67,12 +67,12 @@ function SideBar() {
     document.querySelector('html').classList.add(themeMode);
     
     setTimeout(() => {
-        themeIcon.current.classList.remove('bx-moon', 'bx-sun');
-        themeMode == 'dark' ? themeIcon.current.classList.add('bx-sun') : themeIcon.current.classList.add('bx-moon');
-        themeIcon.current.classList.remove('scale-0');
-        themeIcon.current.classList.add('rotate-[360deg]','scale-1');
+        themeIcon.current?.classList.remove('bx-moon', 'bx-sun');
+        themeMode == 'dark' ? themeIcon.current?.classList.add('bx-sun') : themeIcon.current?.classList.add('bx-moon');
+        themeIcon.current?.classList.remove('scale-0');
+        themeIcon.current?.classList.add('rotate-[360deg]','scale-1');
       },600)
-      themeIcon.current.classList.remove('rotate-[360deg]');
+      themeIcon.current?.classList.remove('rotate-[360deg]');
 
   } , [themeMode]);
 

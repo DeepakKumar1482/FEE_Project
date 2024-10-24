@@ -14,6 +14,7 @@ import Loader from "../components/Loader/loader.jsx";
 import axios from "axios";
 import { ParticlesComponent } from "../components";
 import { TextLoader } from "./";
+import { useSocket } from "../context/Socket";
 
 const Signup = () => {
   const param = useParams();
@@ -22,6 +23,7 @@ const Signup = () => {
   const googleauthProvider = new GoogleAuthProvider();
   const db = getAuth(app);
   const navigate = useNavigate();
+  // const {username, setUsername} = useSocket();
 
   // Improved Signup with Email function with better error handling
   const SignupwithMail = async (values) => {
@@ -99,7 +101,9 @@ const Signup = () => {
       if (res.data.success) {
         message.success(res.data.message);
         localStorage.setItem("token", res.data.token);
-        navigate("/");
+        // setUsername(values.username);
+        localStorage.setItem("username", values.username);
+        navigate(`/`);
       } else {
         message.error(res.data.message);
       }
@@ -203,6 +207,7 @@ const Signup = () => {
                     >
                       <Input
                         className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
+                        // value={username}
                         placeholder="Username"
                       />
                     </Form.Item>

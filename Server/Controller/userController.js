@@ -47,6 +47,7 @@ const LogincheckController = async(req, res) => {
 
         res.status(200).send({
             success: true,
+            username,
             message: 'Logged in',
             token
         });
@@ -63,6 +64,7 @@ const newUserController = async(req, res) => {
 
     try {
         const { name, username, techStack, university, password } = req.body;
+        if(!password) throw new Error("Please enter a password");
         const salt = await bcrypt.genSalt(10);
         const hashedpassword = await bcrypt.hash(password, salt);
         const docRef = await addDoc(usersRef, {
