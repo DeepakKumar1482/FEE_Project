@@ -51,10 +51,7 @@ const LogincheckController = async(req, res) => {
             "Nahi bhai, yeh password nahi chalega. Agla chance lo!",
             "Password galat hai! Aapka dimaag chutti par toh nahi?",
             "Yeh kya bhai, password bhool gaye kya? Try karo phir se!",
-            "Aree beta, galat password hai! Thoda aur dhyan se dal!",
-            "Nahi nahi, yeh password nahi chalega! Retry karo.",
-            "Wah! Kya andaaz hai... bas galat password daal diya!",
-            "Password galat hai! Lagta hai dimaag offline hai."
+            "Galat password pe faltu database call kara diya, ab iska bill kon dega???",
         ];
 
         const userPassword = user.password;
@@ -122,7 +119,8 @@ const newUserController = async(req, res) => {
         await newUser.save();
 
         // Generate a token if needed (optional)
-        const token = newUser.generateAuthToken();
+        // const token = newUser.generateAuthToken();
+        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' });
 
         res.status(201).json({
             success: true,

@@ -6,7 +6,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { Form, Input, message } from "antd";
+import { message } from "antd"; // Only import the message component
 import { useNavigate, Link } from "react-router-dom";
 import Google from "../assets/Google.webp";
 import { useParams } from "react-router-dom";
@@ -24,10 +24,13 @@ const Signup = () => {
   const navigate = useNavigate();
 
   // Improved Signup with Email function with better error handling
-  const SignupwithMail = async (values) => {
+  const SignupwithMail = async (event) => {
+    event.preventDefault();
     setloading(true);
+    const email = event.target.email.value;
+    const password = event.target.password.value;
     try {
-      await createUserWithEmailAndPassword(db, values.email, values.password);
+      await createUserWithEmailAndPassword(db, email, password);
       message.success("Successfully Signed up");
       setloading(false);
       navigate("/profile");
@@ -89,19 +92,22 @@ const Signup = () => {
       });
   };
 
-  const signin = async (values) => {
+  const signin = async (event) => {
+    event.preventDefault();
     try {
       setloading(true);
+      const username = event.target.username.value;
+      const password = event.target.password.value;
       const res = await axios.post(
         "http://localhost:8080/api/user/logincheck",
-        { ...values }
+        { username, password }
       );
       if (res.data.success) {
         message.success(res.data.message);
         localStorage.setItem("token", res.data.token);
         navigate("/");
       } else {
-        message.error(res.data.message, 4);
+        message.error(res.data.message);
       }
       setloading(false);
     } catch (e) {
@@ -110,6 +116,73 @@ const Signup = () => {
       console.log(e);
     }
   };
+
+  const [password, setPassword] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    digit: false,
+    special: false,
+  });
+
+  const updatePasswordStrength = (value) => {
+    setPassword(value);
+    setPasswordStrength({
+      length: value.length >= 8,
+      uppercase: /[A-Z]/.test(value),
+      lowercase: /[a-z]/.test(value),
+      digit: /[0-9]/.test(value),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+    });
+  };
+
+  const passwordValidationRules = [
+    {
+      required: true,
+      message: "Please input your Password!",
+    },
+    {
+      validator: (_, value) => {
+        if (value && value.length >= 8) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error('Password must be at least 8 characters long'));
+      },
+    },
+    {
+      validator: (_, value) => {
+        if (value && /[A-Z]/.test(value)) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error('Password must contain at least one uppercase letter'));
+      },
+    },
+    {
+      validator: (_, value) => {
+        if (value && /[a-z]/.test(value)) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error('Password must contain at least one lowercase letter'));
+      },
+    },
+    {
+      validator: (_, value) => {
+        if (value && /[0-9]/.test(value)) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error('Password must contain at least one digit'));
+      },
+    },
+    {
+      validator: (_, value) => {
+        if (value && /[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error('Password must contain at least one special character'));
+      },
+    },
+  ];
 
   useEffect(() => {
     setTimeout(() => {
@@ -137,40 +210,32 @@ const Signup = () => {
               <div className="w-96 h-auto pb-5 px-10 shadow-lg rounded-md border border-gray-300">
                 {param.signup === "signup" ? (
                   <div className="flex flex-col justify-center items-center gap-6 h-full">
-                    <Form onFinish={SignupwithMail} className="pt-10 w-72">
-                      <Form.Item
+                    <form onSubmit={SignupwithMail} className="pt-10 w-72">
+                      <input
+                        type="email"
                         name="email"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please input your Email!",
-                          },
-                          {
-                            type: "email",
-                            message: "The input is not valid E-mail!",
-                          },
-                        ]}
-                      >
-                        <Input
-                          className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
-                          placeholder="Email"
-                        />
-                      </Form.Item>
-                      <Form.Item
+                        className="w-full bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg mb-4"
+                        placeholder="Email"
+                        required
+                      />
+                      <input
+                        type="password"
                         name="password"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please input your Password!",
-                          },
-                        ]}
-                      >
-                        <Input
-                          type="password"
-                          className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
-                          placeholder="Password"
-                        />
-                      </Form.Item>
+                        className="w-full bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg mb-4"
+                        placeholder="Password"
+                        onChange={(e) => updatePasswordStrength(e.target.value)}
+                        required
+                      />
+                      <div className="text-xs text-gray-400 mb-4">
+                        <p>Password must contain:</p>
+                        <ul className="list-disc list-inside">
+                          <li>At least 8 characters</li>
+                          <li>At least one uppercase letter</li>
+                          <li>At least one lowercase letter</li>
+                          <li>At least one digit</li>
+                          <li>At least one special character</li>
+                        </ul>
+                      </div>
                       <button
                         type="submit"
                         className="w-full h-11 flex items-center justify-center bg-[#695CFE] hover:bg-[#574cd0] active:bg-[#574cd0] active:scale-95 duration-150 text-white text-base font-semibold py-2 gap-2 px-4 mb-4 rounded-lg"
@@ -178,7 +243,7 @@ const Signup = () => {
                         Signup with Mail
                         <i className="bx bx-envelope text-2xl"></i>
                       </button>
-                    </Form>
+                    </form>
                     <button
                       onClick={signupWithGoogle}
                       className="w-72 h-11 text-white flex justify-center items-center gap-x-2 shadow-md hover:bg-white/30 font-semibold py-2 rounded mb-1"
@@ -188,43 +253,31 @@ const Signup = () => {
                     </button>
                   </div>
                 ) : (
-                  <Form
-                    onFinish={signin}
+                  <form
+                    onSubmit={signin}
                     className="pt-10 w-full h-full flex flex-col justify-center -mt-10 userForm"
                   >
-                    <Form.Item
+                    <input
+                      type="text"
                       name="username"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input your Username!",
-                        },
-                      ]}
-                    >
-                      <Input
-                        className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
-                        placeholder="Username"
-                      />
-                    </Form.Item>
-                    <Form.Item
+                      className="w-full bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg mb-4"
+                      placeholder="Username"
+                      required
+                    />
+                    <input
+                      type="password"
                       name="password"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input your Password!",
-                        },
-                      ]}
+                      className="w-full bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg mb-4"
+                      placeholder="Password"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="w-full h-11 bg-[#695CFE] hover:bg-[#574cd0] active:bg-[#574cd0] active:scale-95 duration-150 text-white font- py-2 px-4 mb-4 rounded-lg font-semibold text-base"
                     >
-                      <Input
-                        type="password"
-                        className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
-                        placeholder="Password"
-                      />
-                    </Form.Item>
-                    <button className="w-full h-11 bg-[#695CFE] hover:bg-[#574cd0] active:bg-[#574cd0] active:scale-95 duration-150 text-white font- py-2 px-4 mb-4 rounded-lg font-semibold text-base">
                       Login
                     </button>
-                  </Form>
+                  </form>
                 )}
                 {param.signup === "signin" && (
                   <Link
