@@ -12,42 +12,46 @@ import CreatePost from "./components/CreatePost";
 import ProtectedRoutes from "./components/ProtectedRoutes/Protected";
 import PublicRoute from "./components/ProtectedRoutes/Public";
 import Message from "./components/Message";
+import { UserProvider } from "./ContextApi/UserContext"; // Import UserProvider
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* <Route path="/" element={<Footer />} /> */}
-        <Route
-          path="/:signup"
-          element={
-            <PublicRoute>
-              <Signup />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/:signin"
-          element={
-            <PublicRoute>
-              <Signup />
-            </PublicRoute>
-          }
-        />
-        <Route path="/profile" element={<Profile />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoutes>
-              <Layout />
-            </ProtectedRoutes>
-          }
-        >
-          <Route index element={<Home />} />
-          <Route path="add-post" element={<CreatePost />} />
-          <Route path="/messages" element={<Message />} />
-        </Route>
-      </Routes>
-    </Router>
+    <UserProvider>
+      <Router>
+        <Routes>
+          {/* <Route path="/" element={<Footer />} /> */}
+          <Route
+            path="/:signup"
+            element={
+              <PublicRoute>
+                <Signup />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/:signin"
+            element={
+              <PublicRoute>
+                <Signup />
+              </PublicRoute>
+            }
+          />
+          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoutes>
+                <Layout />
+              </ProtectedRoutes>
+            }
+          >
+            <Route index element={<Home />} />
+            <Route path="add-post" element={<CreatePost />} />
+            <Route path="/messages" element={<Message />} />
+          </Route>
+        </Routes>
+      </Router>
+    </UserProvider>
   );
 }
 

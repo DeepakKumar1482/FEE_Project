@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-    },
-    username: {
+    email: {
         type: String,
         required: true,
         unique: true,
@@ -14,39 +10,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    techStack: {
-        type: [String],
-        required: true,
-    },
-    studyingAt: {
-        type: String,
-    },
-    githubid: {
-        type: String,
-        required: true,
-    },
-    imageurl: {
-        type: String,
-        required: true,
-    },
-    posts: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'postModel',
-    }],
-    savedposts: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'postModel',
-    }],
-    connections: {
-        type: [String],
-    },
-    githubTechStack: {
-        type: [{
-            type: String,
-            type: Number,
-        }]
+    otp: {
+        code: { type: String },
+        otpSentAt: { type: Date },
     }
 });
+
 
 const UserModel = mongoose.model('User', userSchema);
 

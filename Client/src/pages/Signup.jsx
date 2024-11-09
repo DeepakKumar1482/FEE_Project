@@ -2,81 +2,88 @@ import { useEffect, useState } from "react";
 import { app } from "../Firebase/config.js";
 import {
   getAuth,
-  createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { message } from "antd"; // Only import the message component
-import { useNavigate, Link } from "react-router-dom";
+import { message } from "antd";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import Google from "../assets/Google.webp";
-import { useParams } from "react-router-dom";
 import Loader from "../components/Loader/loader.jsx";
 import axios from "axios";
 import { ParticlesComponent } from "../components";
 import { TextLoader } from "./";
+import OTPPopup from "../components/OtpPopup";
+// import ForgotPasswordModal from "./ForgotPasswordModal";
+import  ForgotPasswordModal  from "../components/ForgotPasswordPopup.jsx";
+import { useUser } from "../ContextApi/UserContext.jsx";
 
 const Signup = () => {
   const param = useParams();
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isTextLoader, setIsTextLoader] = useState(true);
-  const googleauthProvider = new GoogleAuthProvider();
-  const db = getAuth(app);
+  const [otpSent, setOtpSent] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [otpValue, setOtpValue] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const googleAuthProvider = new GoogleAuthProvider();
+  const auth = getAuth(app);
   const navigate = useNavigate();
+  const { setUserData } = useUser();
 
-  // Improved Signup with Email function with better error handling
-  const SignupwithMail = async (event) => {
-    event.preventDefault();
-    setloading(true);
-    const email = event.target.email.value;
-    const password = event.target.password.value;
+  // Function to verify OTP
+  const verifyOtp = async () => {
+    setLoading(true);
     try {
-      await createUserWithEmailAndPassword(db, email, password);
-      message.success("Successfully Signed up");
-      setloading(false);
-      navigate("/profile");
-    } catch (error) {
-      setloading(false);
-      if (error.code === "auth/email-already-in-use") {
-        message.error("Email already exists");
-      } else if (error.code === "auth/invalid-email") {
-        message.error("Invalid email address");
-      } else if (error.code === "auth/weak-password") {
-        message.error("Weak password. Please choose a stronger password");
+      const res = await axios.post("http://localhost:8080/api/user/verifyotp", {
+        email,
+        otpValue,
+      });
+      if (res.data.success) {
+        message.success("OTP verified. Signup successful!");
+        setUserData({ email, password });
+        navigate("/profile");
       } else {
-        message.error("An error occurred. Please try again.");
+        message.error(res.data.message);
       }
+    } catch (err) {
+      console.log(err);
+      message.error("OTP verification failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const SignupWithMail = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    try {
+      const res = await axios.post("http://localhost:8080/api/user/register", {
+        email: email,
+        password: password,
+      });
+      if (res.data.success) {
+        message.success("Registered successfully. Sending OTP...");
+        setOtpSent(true);
+      } else {
+        message.error(res.data.message);
+      }
+    } catch (err) {
+      console.log(err);
+      message.error("Registration failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const signupWithGoogle = () => {
-    signInWithPopup(db, googleauthProvider)
+    signInWithPopup(auth, googleAuthProvider)
       .then((result) => {
         const user = result.user;
-        const creationTime = user.metadata.creationTime;
-        const creationObject = new Date(creationTime);
-        const hours = creationObject.getHours().toString().padStart(2, "0");
-        const minutes = creationObject.getMinutes().toString().padStart(2, "0");
-        const seconds = creationObject.getSeconds().toString().padStart(2, "0");
+        const creationTime = new Date(user.metadata.creationTime).getTime();
+        const lastLoginTime = new Date(user.metadata.lastSignInTime).getTime();
 
-        const creationtimeString = `${hours}${minutes}${seconds}`;
-
-        const lastloginTime = user.metadata.lastSignInTime;
-        const lastloginObject = new Date(lastloginTime);
-        const lastloginhours = lastloginObject
-          .getHours()
-          .toString()
-          .padStart(2, "0");
-        const lastloginminutes = lastloginObject
-          .getMinutes()
-          .toString()
-          .padStart(2, "0");
-        const lastloginseconds = creationObject
-          .getSeconds()
-          .toString()
-          .padStart(2, "0");
-        const lastlogintimeString = `${lastloginhours}${lastloginminutes}${lastloginseconds}`;
-
-        if (creationtimeString === lastlogintimeString) {
+        if (creationTime === lastLoginTime) {
           message.success("Signed up successfully");
           navigate("/profile");
         } else {
@@ -85,22 +92,16 @@ const Signup = () => {
         }
       })
       .catch((error) => {
-        console.error("Error during Google sign-in:", error);
-        message.error(
-          "An error occurred during Google sign-in. Please try again."
-        );
+        message.error("An error occurred during Google sign-in. Please try again.");
       });
   };
 
-  const signin = async (event) => {
-    event.preventDefault();
+  const signin = async (values) => {
     try {
-      setloading(true);
-      const username = event.target.username.value;
-      const password = event.target.password.value;
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:8080/api/user/logincheck",
-        { username, password }
+        { ...values }
       );
       if (res.data.success) {
         message.success(res.data.message);
@@ -109,85 +110,18 @@ const Signup = () => {
       } else {
         message.error(res.data.message);
       }
-      setloading(false);
     } catch (e) {
-      setloading(false);
       message.error(e.message);
-      console.log(e);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const [password, setPassword] = useState("");
-  const [passwordStrength, setPasswordStrength] = useState({
-    length: false,
-    uppercase: false,
-    lowercase: false,
-    digit: false,
-    special: false,
-  });
-
-  const updatePasswordStrength = (value) => {
-    setPassword(value);
-    setPasswordStrength({
-      length: value.length >= 8,
-      uppercase: /[A-Z]/.test(value),
-      lowercase: /[a-z]/.test(value),
-      digit: /[0-9]/.test(value),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(value),
-    });
-  };
-
-  const passwordValidationRules = [
-    {
-      required: true,
-      message: "Please input your Password!",
-    },
-    {
-      validator: (_, value) => {
-        if (value && value.length >= 8) {
-          return Promise.resolve();
-        }
-        return Promise.reject(new Error('Password must be at least 8 characters long'));
-      },
-    },
-    {
-      validator: (_, value) => {
-        if (value && /[A-Z]/.test(value)) {
-          return Promise.resolve();
-        }
-        return Promise.reject(new Error('Password must contain at least one uppercase letter'));
-      },
-    },
-    {
-      validator: (_, value) => {
-        if (value && /[a-z]/.test(value)) {
-          return Promise.resolve();
-        }
-        return Promise.reject(new Error('Password must contain at least one lowercase letter'));
-      },
-    },
-    {
-      validator: (_, value) => {
-        if (value && /[0-9]/.test(value)) {
-          return Promise.resolve();
-        }
-        return Promise.reject(new Error('Password must contain at least one digit'));
-      },
-    },
-    {
-      validator: (_, value) => {
-        if (value && /[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-          return Promise.resolve();
-        }
-        return Promise.reject(new Error('Password must contain at least one special character'));
-      },
-    },
-  ];
-
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsTextLoader(false);
     }, 6000);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -202,97 +136,123 @@ const Signup = () => {
               CODEBUDDY
             </h1>
           </div>
-          <div
-            id="loginbox"
-            className="flex justify-center items-center w-full h-full mb-10"
-          >
+          <div id="loginbox" className="flex justify-center items-center w-full h-full mb-10">
             <div className="w-fit flex justify-center backdrop-blur-sm bg-black/30 h-full">
               <div className="w-96 h-auto pb-5 px-10 shadow-lg rounded-md border border-gray-300">
                 {param.signup === "signup" ? (
                   <div className="flex flex-col justify-center items-center gap-6 h-full">
-                    <form onSubmit={SignupwithMail} className="pt-10 w-72">
-                      <input
-                        type="email"
-                        name="email"
-                        className="w-full bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg mb-4"
-                        placeholder="Email"
-                        required
-                      />
-                      <input
-                        type="password"
-                        name="password"
-                        className="w-full bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg mb-4"
-                        placeholder="Password"
-                        onChange={(e) => updatePasswordStrength(e.target.value)}
-                        required
-                      />
-                      <div className="text-xs text-gray-400 mb-4">
-                        <p>Password must contain:</p>
-                        <ul className="list-disc list-inside">
-                          <li>At least 8 characters</li>
-                          <li>At least one uppercase letter</li>
-                          <li>At least one lowercase letter</li>
-                          <li>At least one digit</li>
-                          <li>At least one special character</li>
-                        </ul>
+                    <form onSubmit={SignupWithMail} className="pt-10 w-72">
+                      <div className="mb-4">
+                        <input
+                          onChange={(e) => setEmail(e.target.value)}
+                          type="email"
+                          name="email"
+                          required
+                          className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
+                          placeholder="Email"
+                        />
                       </div>
+
+                      <div className="mb-4">
+                        <input
+                          onChange={(e) => setPassword(e.target.value)}
+                          type="password"
+                          name="password"
+                          required
+                          className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
+                          placeholder="Password"
+                        />
+                      </div>
+
                       <button
                         type="submit"
-                        className="w-full h-11 flex items-center justify-center bg-[#695CFE] hover:bg-[#574cd0] active:bg-[#574cd0] active:scale-95 duration-150 text-white text-base font-semibold py-2 gap-2 px-4 mb-4 rounded-lg"
+                        className="w-full h-11 flex items-center justify-center bg-[#695CFE] hover:bg-[#574cd0] text-white text-base font-semibold mb-4 rounded-lg"
+                        disabled={loading}
                       >
-                        Signup with Mail
-                        <i className="bx bx-envelope text-2xl"></i>
+                        {loading ? "Signing Up..." : "Sign Up"}
                       </button>
                     </form>
+
+                    <div className="w-60 h-5 border-b-2 rounded-md border-[#484848]"></div>
                     <button
                       onClick={signupWithGoogle}
-                      className="w-72 h-11 text-white flex justify-center items-center gap-x-2 shadow-md hover:bg-white/30 font-semibold py-2 rounded mb-1"
+                      className="w-full h-11 flex items-center justify-center bg-[#242526] border border-[#696969] text-[#696969] text-base font-semibold py-2 gap-2 px-4 rounded-lg"
                     >
-                      Signup with Google
-                      <i className="bx bxl-google text-2xl"></i>
+                      Sign Up with Google
+                      <img src={Google} alt="Google Logo" className="h-6" />
                     </button>
                   </div>
                 ) : (
-                  <form
-                    onSubmit={signin}
-                    className="pt-10 w-full h-full flex flex-col justify-center -mt-10 userForm"
-                  >
-                    <input
-                      type="text"
-                      name="username"
-                      className="w-full bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg mb-4"
-                      placeholder="Username"
-                      required
-                    />
-                    <input
-                      type="password"
-                      name="password"
-                      className="w-full bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg mb-4"
-                      placeholder="Password"
-                      required
-                    />
-                    <button
-                      type="submit"
-                      className="w-full h-11 bg-[#695CFE] hover:bg-[#574cd0] active:bg-[#574cd0] active:scale-95 duration-150 text-white font- py-2 px-4 mb-4 rounded-lg font-semibold text-base"
+                  <div className="flex flex-col justify-center items-center gap-6 h-full">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        signin({ username: email, password: password });
+                      }}
+                      className="pt-10 w-72"
                     >
-                      Login
-                    </button>
-                  </form>
-                )}
-                {param.signup === "signin" && (
-                  <Link
-                    to={"/signup"}
-                    className="text-blue-200 hover:text-blue-400 userForm"
-                  >
-                    Don't have an account?{" "}
-                  </Link>
+                      <div className="mb-4">
+                        <input
+                          onChange={(e) => setEmail(e.target.value)}
+                          type="text"
+                          name="username"
+                          required
+                          className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
+                          placeholder="Username/Email"
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <input
+                          onChange={(e) => setPassword(e.target.value)}
+                          type="password"
+                          name="password"
+                          required
+                          className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
+                          placeholder="Password"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full h-11 flex items-center justify-center bg-[#695CFE] hover:bg-[#574cd0] text-white text-base font-semibold mb-4 rounded-lg"
+                        disabled={loading}
+                      >
+                        {loading ? "Signing In..." : "Sign In"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="w-full text-[#c7c7c7] hover:text-white mb-4 text-sm"
+                      >
+                        Forgot Password?
+                      </button>
+                    </form>
+                    <div className="w-60 h-5 border-b-2 rounded-md border-[#484848]"></div>
+                    <Link to="/signup" className="text-[#c7c7c7] hover:text-white">
+                      Don't have an account? Sign Up
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-          {loading && <Loader />}
         </div>
       )}
+
+      {/* OTP Popup for Signup */}
+      <OTPPopup
+        visible={otpSent}
+        onClose={() => setOtpSent(false)}
+        otpValue={otpValue}
+        setOtpValue={setOtpValue}
+        onVerify={verifyOtp}
+      />
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal 
+        visible={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+      />
     </div>
   );
 };

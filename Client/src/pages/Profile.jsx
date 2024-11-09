@@ -9,15 +9,18 @@ const { Option } = Select;
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader/loader";
 import { ParticlesComponent } from "../components";
+import { useUser } from "../ContextApi/UserContext";
 const Profile = () => {
   const navigate = useNavigate();
   // const [imageurl, setImageUrl] = useState("");
-  const [githubName, setGithubName] = useState(null);
-  const [userName, setUserName] = useState(null);
-  const [isUserExist, setIsUserExist] = useState(0);
-  const [val, setval] = useState({});
-  const [temp, settemp] = useState(0);
-  const [flag, setflag] = useState(0);
+  const [githubid, setGithubName] = useState(null);
+  // const [userName, setUserName] = useState(null);
+  // const [isUserExist, setIsUserExist] = useState(0);
+  // const [val, setval] = useState({});
+  // const [temp, settemp] = useState(0);
+  // const [flag, setflag] = useState(0);
+  const { userData } = useUser();
+  const { email, password } = userData;
   const [loading, setloading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const universities = [
@@ -104,7 +107,7 @@ const Profile = () => {
 
   const githubAuthentication = async (e) => {
     e.preventDefault(); // Prevent form submission
-    if (githubName == null) {
+    if (githubid == null) {
       await signInWithPopup(auth, provider)
         .then((result) => {
           const credential = GithubAuthProvider.credentialFromResult(result);
@@ -124,15 +127,19 @@ const Profile = () => {
   const handleFileChange = (event) => {
     setSelectedImage(event.target.files[0]);
   };
-  const formData = new FormData();
+  var formData = new FormData();
   formData.append("image", selectedImage);
-  formData.append("githubName", githubName);
+  // formData.append("githubName", githubName);
 
   const uploaduser = async (values, e) => {
     formData.append("name", values.name);
     formData.append("username", values.username);
-    formData.append("password", values.password);
+    formData.append("password", password);
+    formData.append("email", email);
+    formData.append("techStack", values.techStack);
+    formData.append("githubid", githubid);
     formData.append("university", values.university);
+    console.log("This is Form data -> ",formData);
     // name, username, password, university, techStack
     try {
       const res = await axios.post(
@@ -150,9 +157,11 @@ const Profile = () => {
         message.success("Saved");
         navigate("/");
       } else {
+        formData=new FormData();
         message.error(res.data.message);
       }
     } catch (e) {
+      formData=new FormData();
       console.log(e);
     }
     e.preventDefault();
@@ -210,13 +219,13 @@ const Profile = () => {
                     placeholder="Username"
                   />
                 </Form.Item>
-                <Form.Item name="password" className="">
+                {/* <Form.Item name="password" className="">
                   <Input
                     className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
                     type="password"
                     placeholder="Password"
                   />
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item name="university" className="">
                   <Select
                     mode="single"
