@@ -524,6 +524,13 @@ const MessageController = (req, res) => {
 const uploadcontroller = async(req, res) => {
     try {
         const { githubid, name, username, password, university, techStack,email } = req.body;
+        const user=await UserProfileModel.findOne({username:username});
+        if(user){
+            return res.status(200).send({
+                success: false,
+                message: "Username already exists"
+            });
+        }
         // Check if all required fields are provided
         if (!githubid || !username || !password) {
             return res.status(400).json({
