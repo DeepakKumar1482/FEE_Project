@@ -22,37 +22,21 @@ const io = new Server(httpServer,{
     credentials: true
     }
 });
-app.use('/api/user/', require('./Routes/userRoutes.js'))
-app.use('/api/posts/', require('./Routes/PostRoutes.js'))
-
-
 
 const users = new Set();
 const userSocketid = {};
-// console.log(userSocketid["xyz"]);
-// const recipientSocketId = Object.keys(userSocketid).map(id => userSocketid[id] == "vishal" ? id : null)[0];
-// console.log(recipientSocketId, "recipient");
-// console.log(userSocketid[recipientSocketId], "rec");
 
 let existingUser = null;
 
 io.on('connection', (socket) => {
     socket.on('login', ({username}) => {
         users.add(username.trim());
-        // userSocketid.forEach((value, key) => {
-        //     if(username.trim() == value) existingUser = key;
-        // })
-        // if(existingUser) userSocketid.delete(existingUser);
         userSocketid[socket.id] = username.trim();
         console.log("user connected", username, users.size);
-        console.log("onConnect ", userSocketid);
     })
     
     socket.on('privateChat', ({username, message, recipient}) => {
         const recipientSocketId = Object.keys(userSocketid).find(id => userSocketid[id] == recipient.trim());
-        console.log("message on server", message);
-        console.log(userSocketid, "userSocketid");
-        console.log(recipientSocketId, "recipient");
         if(recipientSocketId){
             if(userSocketid[recipientSocketId] != username){
                 io.to(recipientSocketId).emit('receiveMessage', { username, message });
@@ -78,3 +62,9 @@ io.on('connection', (socket) => {
 httpServer.listen(8080, (req, res) => {
     console.log('listening on port 8080');
 })
+
+
+const messageRouter = require('./Routes/message.routes.js');
+app.use('/api/user/', require('./Routes/userRoutes.js'))
+app.use('/api/posts/', require('./Routes/PostRoutes.js'))
+app.use('/api/message', messageRouter);

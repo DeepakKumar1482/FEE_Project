@@ -11,12 +11,10 @@ const SocketContext = createContext({
 });
 
 export const SocketContextProvider = ({ children }) => {
-    console.log(localStorage.getItem("username")," local ");
     const [username, setUsername] = useState(localStorage.getItem("username"));
     const [socketInstance, setSocketInstance] = useState(null);
     const [connection, setConnection] = useState(false);
     const [messages, setMessages] = useState([]);
-    console.log(username, "username in socket.jsx");
     useEffect(() => {
         const socket = io('http://localhost:8080');
         setSocketInstance(socket);
@@ -27,10 +25,8 @@ export const SocketContextProvider = ({ children }) => {
           };
     },[])
     useEffect(() => {
-        console.log(username, "username in socket")
         if(username != null && connection){
             socketInstance.on('connect' , () => {
-                console.log('connect');
                 socketInstance.emit('login' , {username});
             })
             socketInstance.on('receiveMessage', (data) => {
@@ -38,7 +34,6 @@ export const SocketContextProvider = ({ children }) => {
             })
         }
     }, [username, socketInstance, connection, setUsername])
-    console.log(socketInstance);
     return (
         <SocketContext.Provider value={{username, setUsername, socketInstance, setSocketInstance, messages, setMessages}}>
             {connection ? children : <h1>loading..</h1> }

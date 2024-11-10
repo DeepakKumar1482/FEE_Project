@@ -43,7 +43,7 @@ const LogincheckController = async(req, res) => {
 
         // If the password is correct, generate a JWT token
         const secretKey = "DeepakKumar1482"; // Replace with your actual secret key
-        const token = await jwt.sign({ id: username }, secretKey, { expiresIn: '6d' });
+        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' });
 
         res.status(200).send({
             success: true,
@@ -54,10 +54,11 @@ const LogincheckController = async(req, res) => {
 
     } catch (e) {
         console.log("This is error ", e);
-        res.status(500).send({
+        return res.status(500).send({
             success: false,
             message: "Internal server error"
         });
+        console.log("first")
     }
 };
 const newUserController = async(req, res) => {

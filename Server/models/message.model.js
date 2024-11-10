@@ -1,20 +1,13 @@
-import mongoose, { Schema } from "mongoose";
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const messageSchema = new Schema({
-    conversationId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Conversation',
-        required: true,
-        index: true
-    },
-    senderId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+    sender: {
+        type: String,
         required: true,
     },
-    receiverId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+    receiver: {
+        type: String,
         required: true,
     },
     content: {
@@ -23,3 +16,7 @@ const messageSchema = new Schema({
         trim: true
     }
 },{timestamps: true});
+
+const Message = mongoose.model("Message", messageSchema);
+
+module.exports = Message;
