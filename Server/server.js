@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const {Server} = require('socket.io');
+const connectdatabase = require('./db/connection.js');
 
 
 const app = express();
@@ -27,6 +28,9 @@ const users = new Set();
 const userSocketid = {};
 
 let existingUser = null;
+
+connectdatabase();
+
 
 io.on('connection', (socket) => {
     socket.on('login', ({username}) => {
@@ -58,10 +62,11 @@ io.on('connection', (socket) => {
         console.log("user disconnected", username, users.size);
     })
 })
-
 httpServer.listen(8080, (req, res) => {
     console.log('listening on port 8080');
 })
+
+
 
 
 const messageRouter = require('./Routes/message.routes.js');
