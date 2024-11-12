@@ -148,16 +148,18 @@ const LogincheckController = async(req, res) => {
 
         res.status(200).send({
             success: true,
+            username,
             message: 'Logged in',
             token
         });
 
     } catch (e) {
         console.log("This is error ", e);
-        res.status(500).send({
+        return res.status(500).send({
             success: false,
             message: "Internal server error"
         });
+        console.log("first")
     }
 };
 // const newUserController = async(req, res) => {

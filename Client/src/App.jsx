@@ -13,6 +13,7 @@ import ProtectedRoutes from "./components/ProtectedRoutes/Protected";
 import PublicRoute from "./components/ProtectedRoutes/Public";
 import Message from "./components/Message";
 import { UserProvider } from "./ContextApi/UserContext"; // Import UserProvider
+import { SocketContextProvider } from "./context/Socket";
 
 function App() {
   return (
@@ -41,7 +42,9 @@ function App() {
             path="/"
             element={
               <ProtectedRoutes>
-                <Layout />
+                <SocketContextProvider>
+                  <Layout />
+                </SocketContextProvider>
               </ProtectedRoutes>
             }
           >

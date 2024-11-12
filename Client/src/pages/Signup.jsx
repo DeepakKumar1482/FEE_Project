@@ -106,6 +106,7 @@ const Signup = () => {
       if (res.data.success) {
         message.success(res.data.message);
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("username", values.username);
         navigate("/");
       } else {
         message.error(res.data.message);

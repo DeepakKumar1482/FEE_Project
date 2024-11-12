@@ -153,6 +153,7 @@ const Profile = () => {
       );
       if (res.data.success) {
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("username", values.username);
         console.log(res.data.token);
         message.success("Saved");
         navigate("/");
