@@ -12,6 +12,6 @@ router.post('/reset-password',ResetPasswordController);
 router.post('/isUserExist', IsUserExist);
 router.post('/createpost', authmiddleware, CreatePostController);
 router.post('/logincheck', LogincheckController);
-router.post('/message', authmiddleware, MessageController);
+// router.post('/message', authmiddleware, MessageController);
 router.post('/upload', upload.single('image'), uploadcontroller);
 module.exports = router

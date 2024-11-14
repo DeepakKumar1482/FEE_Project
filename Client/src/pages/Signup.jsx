@@ -35,7 +35,7 @@ const Signup = () => {
   const verifyOtp = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8080/api/user/verifyotp", {
+      const res = await axios.post("/api/user/verifyotp", {
         email,
         otpValue,
       });
@@ -58,7 +58,7 @@ const Signup = () => {
     event.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8080/api/user/register", {
+      const res = await axios.post("/api/user/register", {
         email: email,
         password: password,
       });
@@ -100,7 +100,7 @@ const Signup = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:8080/api/user/logincheck",
+        "/api/user/logincheck",
         { ...values }
       );
       if (res.data.success) {

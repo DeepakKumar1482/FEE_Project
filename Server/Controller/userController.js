@@ -104,6 +104,8 @@ const LogincheckController = async(req, res) => {
         
         var isEmail=false;
         const username=req.body.username;
+
+        console.log(username, password);
         for(var i=0;i<username.length;i++){
             if(username[i]==='@'){
                 isEmail=true;

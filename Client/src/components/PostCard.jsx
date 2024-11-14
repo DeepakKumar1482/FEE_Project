@@ -29,7 +29,7 @@ function PostCard() {
   const fetchPosts = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/posts/getposts",
+        "/api/posts/getposts",
         {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),
@@ -97,7 +97,7 @@ function PostCard() {
           {postdata.post[0].tech.map((tech) => (
             <div
               key={tech}
-              className="flex items-center gap-1 dark:text-white bg-gray-200 dark:bg-gray-700 rounded-md px-2 py-1 min-w-fit"
+              className="flex items-center gap-1 dark:text-white bg-gray-200 text-gray-800 dark:bg-gray-700 rounded-md px-2 py-1 min-w-fit"
             >
               <div className="bg-green-600 w-2 h-2 rounded"></div>
               <p>{tech}</p>

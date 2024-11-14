@@ -1,5 +1,6 @@
+import { loadSlim } from '@tsparticles/slim';
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import {useNavigate, NavLink, Link} from "react-router-dom"
+import {useNavigate, NavLink, Link, useLocation} from "react-router-dom"
 // import {Button} from '../index'
 
 function SideBar() {
@@ -35,20 +36,28 @@ function SideBar() {
       icon: 'bell'
     }, 
   ];
+  // console.log("top : ", location.pathname);
+  const location = useLocation();
 
   function handleSize() {
     if(window.innerWidth <= 1024){
-      console.log("running");
       return false;
     }
-    else{
-      return true;
-    }
+    else if(location.pathname != "/messages" && window.innerWidth > 1024) return true;
   }
-  const [open, setOpen] = useState(handleSize);
+  const [open, setOpen] = useState(() => handleSize());
   const [themeMode, setThemeMode] = useState();
   const themeIcon =  useRef(null);
   const themeLabel = useRef(null);
+
+  useEffect(() => {
+    if(location.pathname == "/messages" ){
+      setOpen(false);
+    }
+    else if(location.pathname != "/messages" && window.innerWidth > 1024){
+      setOpen(true);
+    }
+  },[location])
 
   useEffect(() => {
     const theme = localStorage.getItem('themeMode');
@@ -102,17 +111,33 @@ function SideBar() {
   //     }
   //   });
   // })
-  window.addEventListener('resize', function handleChange(){
-    if(window.innerWidth <= 1024){
-      setOpen(false);
-    }
-    else{
-      setOpen(true);
-    }
-  });
+  useEffect(() => {
+    window.addEventListener('resize', function handleChange(){
+      console.log("location : ", location.pathname + " open : " + open);
+  
+      if(window.innerWidth <= 1024){
+        setOpen(false);
+      }
+      else if(location.pathname == "/messages") setOpen(false);
+      else if(location.pathname !== "/messages") setOpen(true);
+  
+      }
+    );
+  },[])
+  // window.addEventListener('resize', function handleChange(){
+  //   console.log("location : ", location.pathname + " open : " + open);
 
+  //   if(window.innerWidth <= 1024){
+  //     setOpen(false);
+  //   }
+  //   else if(location.pathname == "/messages") setOpen(false);
+  //   else if(location.pathname !== "/messages") setOpen(true);
+
+  //   }
+  // );
+  // [#242526]
   return (
-    <div className={`sticky left-0 top-0 ${open ? "w-64" : "w-16"} duration-300 h-screen dark:bg-[#242526] bg-white dark:border-[#3A3B3C] border-r-[1px]`}>
+    <div className={`sticky left-0 top-0 ${open ? "w-64" : "w-16"} duration-300 h-screen dark:bg-black bg-white dark:border-[#3A3B3C] border-r-[1px]`}>
       <div className="flex items-center py-5 ">
         <Link 
           to="/"
