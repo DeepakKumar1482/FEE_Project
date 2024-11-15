@@ -16,7 +16,7 @@ export const SocketContextProvider = ({ children }) => {
     const [connection, setConnection] = useState(false);
     const [messages, setMessages] = useState([]);
     useEffect(() => {
-        const socket = io('http://localhost:8080');
+        const socket = io('http://192.168.1.7:8080');
         setSocketInstance(socket);
         setConnection(true);
 
