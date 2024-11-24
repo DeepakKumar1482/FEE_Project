@@ -35,7 +35,6 @@ let existingUser = null;
 
 connectdatabase();
 
-
 io.on('connection', (socket) => {
     socket.on('login', ({username}) => {
         users.add(username.trim());
