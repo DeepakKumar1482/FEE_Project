@@ -51,10 +51,19 @@ const Message = () => {
   // );
   const arr =[1,2,3,4,5,6,7,8,9];
   const [isLoading, setIsLoading] = useState(false);
-  const {username} = useSocket();
+  const {username, socketInstance} = useSocket();
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [conversation, setConversation] = useState([]);
   const [receiver, setReceiver] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    if(socketInstance){
+        socketInstance.on('receiveTyping', () => {
+            
+        })
+    }
+  },[])
   useEffect(() => {
     setIsLoading(true);
     const getConversation = async() => {
@@ -65,7 +74,6 @@ const Message = () => {
             Authorization: `Bearer ${token}`
           }
         });
-        console.log(": ", response.data);
         setConversation(response.data.conversations)
         setIsLoading(false);
       } catch (error) {
@@ -78,9 +86,9 @@ const Message = () => {
 
   return (
       <div className="w-full flex">
-          <div className="w-1/4 border-r-[1px] border-gray-700">
+          <div className="w-1/4 border-r-[1px] dark:border-gray-600 border-gray-300">
               {isLoading ? (
-                  <div className="w-full p-4 space-y-4  divide-y divide-gray-200 rounded animate-pulse dark:divide-gray-700 md:p-6 ">
+                  <div className="w-full p-4 space-y-4 divide-y divide-gray-200 rounded animate-pulse dark:divide-gray-700 md:p-6 ">
                       {arr.map((ele, index) => (
                           <div
                               key={index}
@@ -120,7 +128,7 @@ const Message = () => {
                                       <div className="text-gray-800 dark:text-white md:text-base text-sm font-semibold">
                                           {data.name}
                                       </div>
-                                      <div className="dark:text-gray-400 italic md:text-base text-sm">
+                                      <div className="dark:text-gray-400 italic md:text-sm text-xs">
                                           @{data.username}
                                       </div>
                                   </div>
@@ -133,7 +141,7 @@ const Message = () => {
                   </div>
               )}
           </div>
-          <div className="w-2/4 text-gray-800 dark:text-white">
+          <div className="w-2/4 text-gray-800 dark:text-white border-r-[1px] dark:border-gray-600 border-gray-300">
               {selectedConversation ? (
                   <Chat receiver={receiver} conversation={selectedConversation}/>
               ) : (

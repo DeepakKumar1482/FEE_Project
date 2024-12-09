@@ -610,12 +610,12 @@ const uploadcontroller = async(req, res) => {
 
         // Generate a token if needed (optional)
         // const token = newUser.generateAuthToken();
-        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' })
+        // const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' })
 
         res.status(201).json({
             success: true,
             message: 'Image uploaded successfully',
-            token,
+            // token,
         });
 
         // The image has been uploaded to Cloudinary, and the URL is available in req.file.path

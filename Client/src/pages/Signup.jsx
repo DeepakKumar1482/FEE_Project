@@ -16,7 +16,6 @@ import OTPPopup from "../components/OtpPopup";
 // import ForgotPasswordModal from "./ForgotPasswordModal";
 import  ForgotPasswordModal  from "../components/ForgotPasswordPopup.jsx";
 import { useUser } from "../ContextApi/UserContext.jsx";
-
 const Signup = () => {
   const param = useParams();
   const [loading, setLoading] = useState(false);
@@ -31,6 +30,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const { setUserData } = useUser();
   const[tempToken,setTempToken]=useState("");
+  // const 
   // Function to verify OTP
   const verifyOtp = async () => {
     setLoading(true);
@@ -43,7 +43,9 @@ const Signup = () => {
       if (res.data.success) {
         message.success("OTP verified. Signup successful!");
         setUserData({ email, password });
-        localStorage.setItem("token", tempToken);
+        // localStorage.setItem("token", tempToken);
+        setUserData((prev)=>{return {...prev,token:tempToken}});
+        console.log("This is res.data--------->");
         navigate("/profile");
       } else {
         message.error(res.data.message);
@@ -187,7 +189,7 @@ const Signup = () => {
         message.success(res.data.message);
         localStorage.setItem("token", res.data.token);
         console.log("This is res.data--------->",res.data.user.email);
-        localStorage.setItem("username", res.data.user.email);
+        localStorage.setItem("username", res.data.user.username);
         navigate("/");
       } else {
         message.error(res.data.message);

@@ -23,6 +23,7 @@ const Profile = () => {
   const { email, password } = userData;
   const [loading, setloading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+
   const universities = [
     "IIT Bombay",
     "IIT Delhi",
@@ -171,6 +172,10 @@ const Profile = () => {
   }
 
   const uploaduser = async (values, e) => {
+    if(!userData.token){
+      message.error("Please Register first");
+      return;
+    }
     const nameCheck=validateName(values.name);
     if(!nameCheck){
       return;
@@ -215,7 +220,7 @@ const Profile = () => {
         }
       );
       if (res.data.success) {
-        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("token", userData.token);
         localStorage.setItem("username", values.username);
         console.log(res.data.token);
         message.success("Saved");
@@ -230,6 +235,7 @@ const Profile = () => {
     }
     e.preventDefault();
   };
+  console.log("userdata: ", userData.token)
   return (
     <div>
       <ParticlesComponent />

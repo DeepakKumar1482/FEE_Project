@@ -1,8 +1,7 @@
 import React, { useRef, useState } from 'react';
 import {motion} from "framer-motion";
-import ImageCarousel2 from './ImageCarousel2.jsx';
 import ImageCarousel3 from './ImageCarousel3.jsx';
-import {LikesModalComp, ImageCarousel} from "./index.js"
+import {LikesModalComp} from "./index.js"
 import myImg from "../images/Screenshot 2024-03-29 112144.png";
 import myImg1 from "../images/free-photo-of-red-cherries-in-bowl-and-basket.jpeg";
 import myImg2 from "../images/tanjiro_hinokami_kagura.jpg";

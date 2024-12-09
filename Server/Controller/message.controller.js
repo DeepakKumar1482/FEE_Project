@@ -44,11 +44,11 @@ const sendMessage = async (req, res) => {
         //     (id) => userSocketid[id] == msg.receiver.username
         // );
         console.log(userSocketid[msg.receiver.username])
+        io.to(userSocketid[msg.sender.username]).emit("receiveMessage", msg);
         // console.log(msg);
         if(userSocketid[msg.receiver.username]){
             console.log("inside the socketid ");
             io.to(userSocketid[msg.receiver.username]).emit("receiveMessage", msg);
-            io.to(userSocketid[msg.sender.username]).emit("receiveMessage", msg);
         }
         // io.emit("privateChat", ({ username, message, recipient }) => {
         // });
@@ -73,6 +73,8 @@ const getMessage = async (req, res) => {
     try {
         const sender = req.user._id;
         const { receiver } = req.body;
+        // const { cursor, limit } = req.body.param;
+
         if (!(sender && receiver)) {
             return res
                 .json({
@@ -83,6 +85,9 @@ const getMessage = async (req, res) => {
         }
 
         // NOTE: Below we used nested populate and other properties like we can pass array of multiple paths in the populate and can also use select property for field selection from document.
+
+        // console.log("cursor" ,  cursor);
+
         const conversation = await Conversation.findOne({
             participants: { $all: [sender, receiver] },
         }).populate([
@@ -93,13 +98,19 @@ const getMessage = async (req, res) => {
             {
                 path: "messages",
                 select: " -__v",
-                // options: { sort: {updatedAt : -1}}
+                // options: {
+                //     sort: {updatedAt : -1},
+                //     limit : Number(10),
+                //     skip : (Number(cursor) - 1) * Number(limit)
+                // },
+                // limit: 10,
                 populate: {
                     path: "sender receiver",
                     select: "username name imageurl",
                 },
             },
         ]);
+        // console.log(conversation);
         if (conversation) {
             return res
                 .json({
@@ -112,7 +123,7 @@ const getMessage = async (req, res) => {
         return Response.json({
             success: false,
             message: `No conversation exists`,
-            chats: null,
+            chats: [],
         }).status(404);
     } catch (error) {
         console.log(error);
