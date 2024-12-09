@@ -34,8 +34,25 @@ const authmiddleware = async(req, res, next) => {
         }
     
         const decodedToken = jwt.verify(token, process.env.secretKey);
-        const user = await ProfileModel.findOne({username: decodedToken.id});
-    
+        var isEmail=false;
+        // const username=req.body.username;
+
+        // console.log(username, password);
+        for(var i=0;i<decodedToken.id.length;i++){
+            if(decodedToken.id[i]==='@'){
+                isEmail=true;
+                break;
+            }
+        }
+        var user;
+        if(isEmail){
+            console.log("inside is email");
+         user= await ProfileModel.findOne({email: decodedToken.id});
+        }else{
+            console.log("inside username");
+        user = await ProfileModel.findOne({username: decodedToken.id});
+    }
+    console.log(user);
         if(!user){
             const error = new Error("Invalid token");
             error.statusCode = 400;

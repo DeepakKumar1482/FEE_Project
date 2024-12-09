@@ -51,6 +51,9 @@ const userProfileSchema = new mongoose.Schema({
             count: { type: Number },
         }]
     },
+    about: {
+        type: String,
+    },
 });
 
 const ProfileModel = mongoose.model('UserProfile', userProfileSchema);

@@ -130,8 +130,71 @@ const Profile = () => {
   var formData = new FormData();
   formData.append("image", selectedImage);
   // formData.append("githubName", githubName);
+  function validateName(name) {
+    const nameRegex = /^[a-zA-Z]+(?:[ '-][a-zA-Z]+)*$/;
+  
+    if (!name || name.length < 1 || name.length > 50) {
+      message.info("Error: Name must be between 1 and 50 characters.");
+      return false;
+    }
+  
+    if (!nameRegex.test(name)) {
+      message.info("Error: Name contains invalid characters or formatting.");
+      return false;
+    }
+  
+    // message.info("Valid name.");
+    return true;
+  }
+  
+  function validateUsername(username) {
+    const usernameRegex = /^(?!.*[._]{2})[a-zA-Z0-9._]{3,30}$/;
+  
+    if (!username || username.length < 3 || username.length > 30) {
+      message.info("Error: Username must be between 3 and 30 characters.");
+      return false;
+    }
+  
+    if (!usernameRegex.test(username)) {
+      message.info("Error: Username contains invalid characters or formatting.");
+      return false;
+    }
+  
+    if (username.startsWith('.') || username.startsWith('_') || 
+        username.endsWith('.') || username.endsWith('_')) {
+      message.info("Error: Username cannot start or end with '.' or '_'.");
+      return false;
+    }
+  
+    // message.info("Valid username.");
+    return true;
+  }
 
   const uploaduser = async (values, e) => {
+    const nameCheck=validateName(values.name);
+    if(!nameCheck){
+      return;
+    }
+    const usernameCheck=validateUsername(values.username);
+    if(!usernameCheck){
+      return;
+    }
+    if(!selectedImage){
+      message.info("Please select an image");
+      return;
+    }
+    if(!values.university){
+      message.info("Please select a university");
+      return;
+    }
+    if(!values.techStack){
+      message.info("Please select a techStack");
+      return;
+    }
+    if(!githubid){
+      message.info("Please authenticate with github");
+      return;
+    }
     formData.append("name", values.name);
     formData.append("username", values.username);
     formData.append("password", password);

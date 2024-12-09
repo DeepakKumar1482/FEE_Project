@@ -37,7 +37,7 @@ const num = 1234555;
       className='flex justify-center items-center dark:bg-[#242526] bg-white rounded-lg w-[65rem] h-[40rem] -mt-4'>
 
         <div className='flex w-[55%] h-[40rem] rounded-xl justify-center items-center bg-black'>
-            <ImageCarousel3 data={data.imageurls} height={'h-[40rem]'}/>
+            <ImageCarousel3 data={data.imageUrls} height={'h-[40rem]'}/>
           {/* <div className='flex justify-center items-center'> */}
           {/* </div> */}
         </div> {/*Post Media Side*/}
@@ -45,11 +45,11 @@ const num = 1234555;
         <div className=' dark:bg-[#242526] bg-white [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 w-[45%] overflow-y-scroll relative h-full px-0 pt-4 rounded-lg'>
           <div className='flex gap-1 px-3 items-center'>
             <div className='rounded text-lg dark:text-white text-gray-800'>
-              <img className='w-10 h-10 rounded-full' src={data.avatar} alt="" srcset="" />
+              <img className='w-10 h-10 rounded-full' src={data.userid.imageurl} alt="" srcset="" />
               {/* <i className='bx bx-user'></i> */}
             </div>
             <div className='dark:text-white text-gray-800'>
-              <p>@ {data.username}</p>
+              <p>@ {data.userid.username}</p>
             </div>
           </div>
           <div className='dark:text-white px-3 text-gray-800'>

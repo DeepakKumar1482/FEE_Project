@@ -5,7 +5,7 @@ const usersRef = collection(app, "users");
 const postsRef = collection(app, "posts");
 const UserModel = require('../schema/userSchema');
 const postModel = require('../schema/postSchema');
-const UserProfileModel = require('../schema/userProfileSchema');
+const ProfileModel = require('../schema/userProfileSchema');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -19,12 +19,6 @@ const secretKey = process.env.secretKey;
 const UserRegistrationController = async (req, res) => {
     try {
         const isEmailExist = await UserModel.findOne({ email: req.body.email });
-        if (isEmailExist) {
-            return res.status(200).json({
-                success: false,
-                message: 'Email already exists',
-            });
-        }
         
         const otp = Math.floor(100000 + Math.random() * 900000);
         const otpExpiry = new Date(Date.now() + 2 * 60 * 1000);  // Expire in 2 minutes
@@ -44,6 +38,33 @@ const UserRegistrationController = async (req, res) => {
             text: `Your OTP is ${otp}. It's valid for 10 minutes.`,
         };
 
+        const token = jwt.sign({ id: req.body.email }, secretKey, { expiresIn: '6d' });
+
+        if (isEmailExist) {
+            const isProfileExist=await ProfileModel.findOne({email:req.body.email});
+            console.log("This is isProfileExist -> ",isProfileExist);
+            if(isProfileExist==null){
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) console.log('Error sending email:', error);
+                    else console.log('Email sent:', info.response);
+                });
+                isEmailExist.otp = {
+                    code: otp,
+                    otpSentAt: otpExpiry,
+                }
+                await isEmailExist.save();
+                return res.status(200).json({
+                    success: true,
+                    message: 'Please check your email for the OTP.And Verify your email',
+                    token
+                });
+            }else{
+            return res.status(200).json({
+                success: false,
+                message: 'Email already exists',
+            });
+        }
+        }
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) console.log('Error sending email:', error);
             else console.log('Email sent:', info.response);
@@ -64,6 +85,7 @@ const UserRegistrationController = async (req, res) => {
         res.status(201).json({
             success: true,
             message: 'User registered successfully. Please check your email for the OTP.',
+            token
         });
     } catch (error) {
         console.log(error);
@@ -87,8 +109,10 @@ const VerifyOtpController = async (req, res) => {
                 message: 'OTP expired. Request a new OTP.',
             });
         }
+        console.log(user.otp.code)
 
-        await UserModel.updateOne({ email: req.body.email }, { $unset: { otp: 1, otpExpiry: 1 } });
+        const check=await UserModel.updateOne({ email: req.body.email }, { $unset: { otp: 1, otpExpiry: 1 } });
+        console.log(check);
         res.status(200).json({
             success: true,
             message: 'OTP verified. Signup successful!',
@@ -115,14 +139,20 @@ const LogincheckController = async(req, res) => {
         var user;
         if(isEmail){
             console.log("inside Isemail");
-            user=await UserProfileModel.findOne({email:req.body.username});
+            user=await ProfileModel.findOne({email:req.body.username});
+            flag=true;
         }else{
-            user = await UserProfileModel.findOne({ username:req.body.username });
+            user = await ProfileModel.findOne({ username:req.body.username });
         }
+        // if(flag){
+        //     user=await UserModel.findOne({email:req.body.username});
+        // }
+        console.log("This is user ->",user);
         if (!user) {
             return res.status(200).send({
                 success: false,
-                message: "User मौजूद नहीं है |"
+                message: "User मौजूद नहीं है |",
+                user
             });
         }
        
@@ -150,9 +180,10 @@ const LogincheckController = async(req, res) => {
 
         res.status(200).send({
             success: true,
-            username,
+            // username,
             message: 'Logged in',
-            token
+            token,
+            user
         });
 
     } catch (e) {
@@ -162,6 +193,30 @@ const LogincheckController = async(req, res) => {
             message: "Internal server error"
         });
         console.log("first")
+    }
+};
+const GetUserController = async(req, res) => {
+    try {
+        console.log("This is req -> ", req.body.email);
+        const user = await ProfileModel.findOne({ email: req.body.email });
+        console.log("This is user -> ", user);
+        if (!user) {
+            console.log("User not found");
+            return res.status(200).send({
+                success: false,
+                message: "User not found"
+            });
+        }
+        res.status(200).send({
+            success: true,
+            data: user
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            success: false,
+            message: "Internal server error"
+        });
     }
 };
 // const newUserController = async(req, res) => {
@@ -246,45 +301,30 @@ const IsUserExist = async(req, res) => {
 const CreatePostController = async(req, res) => {
     try {
         const username = req.userName;
-        imageurls = req.body.imageUrls;
+        const user=await ProfileModel.findOne({username:username});
+        const userid=user._id;
+        const imageUrls = req.body.imageUrls[0];
+        console.log("this is imageurls",imageUrls);
         const { description, githubRepo, tech, currDate, currTime } = req.body;
-        const usernameQuery = query(usersRef, where("username", "==", username));
-        const querySnapshot = await getDocs(usernameQuery);
-        querySnapshot.forEach((doc) => {
-            const userData = doc.data();
-            const updatedSavedPosts = [...userData.savedposts, {
-                imageurls,
-                description,
-                githubRepo,
-                tech,
-                Time: {
-                    date: currDate,
-                    time: currTime
-                }
-            }];
-            setDoc(doc.ref, { savedposts: updatedSavedPosts }, { merge: true });
-        });
-        let name, avatar;
-        querySnapshot.forEach((doc) => {
-            const userData = doc.data();
-            name = userData.name;
-            avatar = userData.imageurl;
+        const newpost=new postModel({
+            imageUrls,
+            description,
+            githubRepo,
+            tech,
+            Time: {
+                date: currDate,
+                time: currTime
+            },
+            userid
         })
-        const post = await addDoc(postsRef, {
-            post: [{
-                name,
-                avatar,
-                username,
-                imageurls,
-                description,
-                githubRepo,
-                tech,
-                Time: {
-                    date: currDate,
-                    time: currTime
-                }
-            }]
-        })
+        await newpost.save();
+        console.log("This is new post -> ",newpost._id);
+        console.log(username);
+        // const user=await ProfileModel.findOne({username:username});
+        // console.log(user.ObjectId);
+        user.posts.push(newpost);
+        await user.save();
+        console.log(user.posts);
         res.status(200).send({
             success: true,
             message: 'Saved'
@@ -296,7 +336,7 @@ const CreatePostController = async(req, res) => {
             message: "Internal server error",
         })
     }
-}
+};
 const pusher = new Pusher({
     appId: "1848765",
     key: "abee743b1c2ab29528ad",
@@ -360,7 +400,7 @@ const SendOtpController = async(req, res) => {
                 message: "OTP sent successfully",
             });
         }else{
-            const userProfile=await UserProfileModel.findOne({username:req.body.email});
+            const userProfile=await ProfileModel.findOne({username:req.body.email});
             if (!userProfile) {
                 return res.status(200).send({
                     success: false,
@@ -442,7 +482,7 @@ const VerifyForgotOtpController = async(req, res) => {
                 message: "OTP verified successfully"
             });
         }else{
-            const userProfile=await UserProfileModel.findOne({username:email});
+            const userProfile=await ProfileModel.findOne({username:email});
             const user = await UserModel.findOne({ email: userProfile.email });
             if(user.otp.code !== otp){
                 return res.status(200).send({
@@ -475,7 +515,7 @@ const ResetPasswordController = async(req, res) => {
             const user = await UserModel.findOne({ email: email });
             user.password = hashedPassword;
             await user.save();
-            const userProfileUser=await UserProfileModel.findOne({email:email});
+            const userProfileUser=await ProfileModel.findOne({email:email});
             userProfileUser.password=hashedPassword;
             await userProfileUser.save();
             return res.status(200).send({
@@ -483,7 +523,7 @@ const ResetPasswordController = async(req, res) => {
                 message: "Password reset successfully"
             });
         }else{
-            const userProfile=await UserProfileModel.findOne({username:email});
+            const userProfile=await ProfileModel.findOne({username:email});
             const user = await UserModel.findOne({ email: userProfile.email });
             user.password = hashedPassword;
             await user.save();
@@ -555,7 +595,7 @@ const uploadcontroller = async(req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         // password = hashedPassword
         // Create the user
-        const newUser = new UserProfileModel({
+        const newUser = new ProfileModel({
             githubid,
             name,
             username,
@@ -588,6 +628,42 @@ const uploadcontroller = async(req, res) => {
         console.log(e);
     }
 }
+const UpdateAboutController=async(req,res)=>{
+    try{
+        const user=await ProfileModel.findOne({email:req.body.username});
+        console.log(user);
+        user.about=req.body.about;
+        await user.save();
+        res.status(200).send({
+            success:true,
+            message:"About updated successfully"
+        });
+    }catch(err){
+        console.log(err);
+    }
+}
+
+const AddConnectionController = async(req, res) => {
+    
+    try {
+        const { username, connectionUsername } = req.body;
+        console.log("This is connectionUsername -> ",username, connectionUsername);
+        const user = await ProfileModel.findOne({username:username});
+        user.connections.push(connectionUsername);
+        await user.save();
+        res.status(200).send({
+            success: true,
+            message: 'Connection added successfully'
+        });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+}
 module.exports = {
     UserRegistrationController,
     VerifyOtpController,
@@ -599,5 +675,8 @@ module.exports = {
     LogincheckController,
     LogincheckController,
     MessageController,
-    uploadcontroller
+    uploadcontroller,
+    GetUserController,
+    UpdateAboutController,
+    AddConnectionController
 };

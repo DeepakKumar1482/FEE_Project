@@ -30,18 +30,20 @@ const Signup = () => {
   const auth = getAuth(app);
   const navigate = useNavigate();
   const { setUserData } = useUser();
-
+  const[tempToken,setTempToken]=useState("");
   // Function to verify OTP
   const verifyOtp = async () => {
     setLoading(true);
     try {
       const res = await axios.post("/api/user/verifyotp", {
         email,
+        password,
         otpValue,
       });
       if (res.data.success) {
         message.success("OTP verified. Signup successful!");
         setUserData({ email, password });
+        localStorage.setItem("token", tempToken);
         navigate("/profile");
       } else {
         message.error(res.data.message);
@@ -53,9 +55,85 @@ const Signup = () => {
       setLoading(false);
     }
   };
+  function validatePassword(password) {
+    const minLength = 8; // Minimum length of 8 characters
+    const hasUpperCase = /[A-Z]/.test(password); // At least one uppercase letter
+    const hasLowerCase = /[a-z]/.test(password); // At least one lowercase letter
+    const hasDigits = /\d/.test(password); // At least one digit
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password); // At least one special character
+  
+    // Check each condition
+    if (password.length < minLength) {
+      message.error("Password must be at least 8 characters long!");
+      return false;
+    }
+    if (!hasUpperCase) {
+       message.error("Password must contain at least one uppercase letter!");
+      return false;
+    }
+    if (!hasLowerCase) {
+      message.error("Password must contain at least one lowercase letter!");
+      return false;
+    }
+    if (!hasDigits) {
+      message.error("Password must contain at least one digit!");
+      return false;
+    }
+    if (!hasSpecialChar) {
+      message.error("Password must contain at least one special character!");
+      return false;
+    }
+  
+    // If all conditions are met
+    message.info("Password is strong now.");
+    return true;
+  }
 
+
+
+  function validateGmail(email) {
+    // Regular expression to validate Gmail address
+    const regex = /^[a-zA-Z0-9](\.?[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-])*@[gG][mM][aA][iI][lL]\.com$/;
+  
+    if (!email || email.length > 320) {
+      message.info("Error: Email length exceeds 320 characters or is empty.");
+      return false;
+    }
+  
+    if (!regex.test(email)) {
+      message.info("Error: Invalid Gmail address format.");
+      return false;
+    }
+  
+    const [localPart, domainPart] = email.split("@");
+    
+    if (localPart.length > 64) {
+      message.info("Error: Local part exceeds 64 characters.");
+      return false;
+    }
+  
+    if (domainPart.length > 255) {
+      message.info("Error: Domain part exceeds 255 characters.");
+      return false;
+    }
+  
+    if (localPart.startsWith(".") || localPart.endsWith(".") || localPart.includes("..")) {
+       message.info("Error: Local part contains invalid dot placement.");
+       return false;
+    }
+  
+    return true;
+  }
   const SignupWithMail = async (event) => {
     event.preventDefault();
+    const isValidEmail=validateGmail(email);
+    if(!isValidEmail){
+      return;
+    }
+    const isValidPassowrd=validatePassword(password);
+    if(!isValidPassowrd){
+      return;
+    }
     setLoading(true);
     try {
       const res = await axios.post("/api/user/register", {
@@ -64,8 +142,10 @@ const Signup = () => {
       });
       if (res.data.success) {
         message.success("Registered successfully. Sending OTP...");
+        setTempToken(res.data.token);
         setOtpSent(true);
       } else {
+        navigate("/signin");
         message.error(res.data.message);
       }
     } catch (err) {
@@ -106,7 +186,8 @@ const Signup = () => {
       if (res.data.success) {
         message.success(res.data.message);
         localStorage.setItem("token", res.data.token);
-        localStorage.setItem("username", values.username);
+        console.log("This is res.data--------->",res.data.user.email);
+        localStorage.setItem("username", res.data.user.email);
         navigate("/");
       } else {
         message.error(res.data.message);
@@ -175,13 +256,13 @@ const Signup = () => {
                     </form>
 
                     <div className="w-60 h-5 border-b-2 rounded-md border-[#484848]"></div>
-                    <button
+                    {/* <button
                       onClick={signupWithGoogle}
                       className="w-full h-11 flex items-center justify-center bg-[#242526] border border-[#696969] text-[#696969] text-base font-semibold py-2 gap-2 px-4 rounded-lg"
                     >
                       Sign Up with Google
                       <img src={Google} alt="Google Logo" className="h-6" />
-                    </button>
+                    </button> */}
                   </div>
                 ) : (
                   <div className="flex flex-col justify-center items-center gap-6 h-full">

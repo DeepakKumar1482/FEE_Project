@@ -42,7 +42,10 @@ function Chat({conversation, receiver}) {
 
   const sendMessage = async() => {
     try {
-      if(message.trim() === '') return;
+      if(message.trim() === ''){
+        setMessage('');
+        return;
+      } 
       const token = localStorage.getItem("token");
       const response = await axios.post("/api/message/sendMessage", {receiver : conversation._id, message}, {headers: {Authorization: 'Bearer '+ token}});
 
