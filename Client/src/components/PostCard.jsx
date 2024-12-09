@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ModalPost } from "./index";
 import axios from "axios";
-import { ImageCarousel } from "./index";
 import ImageCarousel3 from "./ImageCarousel3";
 function PostCard() {
   const [isOpen, setIsOpen] = useState(false);

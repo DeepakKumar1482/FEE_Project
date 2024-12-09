@@ -57,6 +57,11 @@ io.on('connection', (socket) => {
     //         io.to(socket.id).emit('receiveMessage', { username:"SERVER", message:"Error sending message"})
     //     }
     // })
+
+    socket.on('typing', ({username}) => {
+        socket.to(userSocketid[username]).emit("receiveTyping", ({typing: true}));
+    })
+
     socket.on('disconnect', () => {
         const username = userSocketid[socket.id];
         if(username){

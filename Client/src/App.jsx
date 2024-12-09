@@ -1,11 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import {
-  PostCard,
-  SideBar,
-  Footer,
-  ImageCarousel,
-  FullPreview,
-} from "./components";
 import { Signup, Home, Profile, TextLoader } from "./pages";
 import Layout from "./Layout";
 import CreatePost from "./components/CreatePost";

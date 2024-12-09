@@ -18,6 +18,14 @@ const postSchema = new mongoose.Schema({
         date: String,
         time: String,
     },
+    likes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }],
+    comments:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment"
+    }]
 }, { timestamps: true });
 
 const postModel = mongoose.model('Post', postSchema);

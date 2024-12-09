@@ -26,7 +26,7 @@ function SideBar() {
       icon: 'bookmark'
     }, 
     {
-      name: 'Add Post',
+      name: 'Post',
       slug: 'add-post',
       icon: 'plus-circle'
     }, 
@@ -162,7 +162,7 @@ function SideBar() {
               >
                 <div className='flex justify-start items-center w-fit'>
                   <span className="inline-flex relative items-center justify-center h-12 w-12 mr-1 text-2xl"><i className={`bx bx-${item.icon}`}>{((item.name == "Notifications" || item.name == "Messages") && !open) ? <div className='w-2 h-2 bg-red-500 rounded absolute top-2'></div> : null}</i></span>
-                  <span className={`text-base font-[550] ${open ? "block" : "hidden"} duration-300`}>{item.name}</span>
+                  <span className={`text-base font-[550] overflow-hidden ${open ? "block scale-100" : "hidden scale-0"} duration-300`}>{item.name}</span>
                 </div>
                 <span className={`${((item.name == "Notifications" || item.name == "Messages") && open) ? "" : "scale-0"} mr-6 text-sm bg-red-100 rounded-full ml-2 px-3 py-px text-red-500`}>5</span>
                 {/* {((item.name == "Notifications" || item.name == "Messages") && open) ? <span className="mr-6 text-sm bg-red-100 rounded-full float-right px-3 py-px text-red-500">5</span> : null} */}
@@ -191,7 +191,7 @@ function SideBar() {
                   ref={themeIcon}
                   className='bx bx-moon text-2xl duration-500'></i>
                   <span className={`text-base font-[550] ml-4 ${open ? "block" : "hidden"} duration-300`}>
-                  {themeMode == "dark"? "Light Mode" : "Dark Mode"}</span>
+                  {themeMode == "dark"? "Appearance" : "Appearance"}</span>
                 </div>
               </div>
             </label>
