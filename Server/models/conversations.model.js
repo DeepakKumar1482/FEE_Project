@@ -3,8 +3,8 @@ const { Schema } = mongoose;
 
 const conversationSchema = new Schema({
     participants: [{
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId,
+        ref: 'UserProfile',
     }],
     messages: [{
         type: Schema.Types.ObjectId,

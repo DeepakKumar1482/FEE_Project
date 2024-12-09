@@ -1,17 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import {
-  PostCard,
-  SideBar,
-  Footer,
-  ImageCarousel,
-  FullPreview,
-} from "./components";
+// import {
+//   PostCard,
+//   SideBar,
+//   Footer,
+//   ImageCarousel,
+//   FullPreview,
+// } from "./components";
 import { Signup, Home, Profile, TextLoader } from "./pages";
 import Layout from "./Layout";
 import CreatePost from "./components/CreatePost";
 import ProtectedRoutes from "./components/ProtectedRoutes/Protected";
 import PublicRoute from "./components/ProtectedRoutes/Public";
 import Message from "./components/Message";
+import UserProfile from "./components/UserProfile";
 import { UserProvider } from "./ContextApi/UserContext"; // Import UserProvider
 import { SocketContextProvider } from "./context/Socket";
 
@@ -30,6 +31,14 @@ function App() {
             }
           />
           <Route
+            path="/userprofile/:username"
+            element={
+              <ProtectedRoutes>
+                <UserProfile />
+              </ProtectedRoutes>
+            }
+          />
+          <Route
             path="/:signin"
             element={
               <PublicRoute>
@@ -37,7 +46,11 @@ function App() {
               </PublicRoute>
             }
           />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={
+            // <ProtectedRoutes>
+              <Profile />
+            // </ProtectedRoutes>
+            } />
           <Route
             path="/"
             element={

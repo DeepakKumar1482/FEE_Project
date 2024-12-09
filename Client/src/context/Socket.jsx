@@ -29,9 +29,9 @@ export const SocketContextProvider = ({ children }) => {
             socketInstance.on('connect' , () => {
                 socketInstance.emit('login' , {username});
             })
-            socketInstance.on('receiveMessage', (data) => {
-                setMessages((prev) => [...prev, data]);
-            })
+            // socketInstance.on('receiveMessage', (data) => {
+            //     setMessages((prev) => [...prev, data]);
+            // })
         }
     }, [username, socketInstance, connection, setUsername])
     return (

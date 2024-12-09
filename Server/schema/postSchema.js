@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const postSchema = new mongoose.Schema({
     imageUrls: {
         type: [String],
@@ -14,10 +13,10 @@ const postSchema = new mongoose.Schema({
     tech: {
         type: [String],
     },
-    time: {
-        date: String,
-        time: String,
-    },
+    userid:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'UserProfile'
+    }
 }, { timestamps: true });
 
 const postModel = mongoose.model('Post', postSchema);

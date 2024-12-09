@@ -1,5 +1,6 @@
+import { loadSlim } from '@tsparticles/slim';
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import {useNavigate, NavLink, Link} from "react-router-dom"
+import {useNavigate, NavLink, Link, useLocation} from "react-router-dom"
 // import {Button} from '../index'
 
 function SideBar() {
@@ -25,7 +26,7 @@ function SideBar() {
       icon: 'bookmark'
     }, 
     {
-      name: 'Add Post',
+      name: 'Post',
       slug: 'add-post',
       icon: 'plus-circle'
     }, 
@@ -35,20 +36,28 @@ function SideBar() {
       icon: 'bell'
     }, 
   ];
+  // console.log("top : ", location.pathname);
+  const location = useLocation();
 
   function handleSize() {
     if(window.innerWidth <= 1024){
-      console.log("running");
       return false;
     }
-    else{
-      return true;
-    }
+    else if(location.pathname != "/messages" && window.innerWidth > 1024) return true;
   }
-  const [open, setOpen] = useState(handleSize);
+  const [open, setOpen] = useState(() => handleSize());
   const [themeMode, setThemeMode] = useState();
   const themeIcon =  useRef(null);
   const themeLabel = useRef(null);
+
+  useEffect(() => {
+    if(location.pathname == "/messages" ){
+      setOpen(false);
+    }
+    else if(location.pathname != "/messages" && window.innerWidth > 1024){
+      setOpen(true);
+    }
+  },[location])
 
   useEffect(() => {
     const theme = localStorage.getItem('themeMode');
@@ -102,17 +111,33 @@ function SideBar() {
   //     }
   //   });
   // })
-  window.addEventListener('resize', function handleChange(){
-    if(window.innerWidth <= 1024){
-      setOpen(false);
-    }
-    else{
-      setOpen(true);
-    }
-  });
+  useEffect(() => {
+    window.addEventListener('resize', function handleChange(){
+      console.log("location : ", location.pathname + " open : " + open);
+  
+      if(window.innerWidth <= 1024){
+        setOpen(false);
+      }
+      else if(location.pathname == "/messages") setOpen(false);
+      else if(location.pathname !== "/messages") setOpen(true);
+  
+      }
+    );
+  },[])
+  // window.addEventListener('resize', function handleChange(){
+  //   console.log("location : ", location.pathname + " open : " + open);
 
+  //   if(window.innerWidth <= 1024){
+  //     setOpen(false);
+  //   }
+  //   else if(location.pathname == "/messages") setOpen(false);
+  //   else if(location.pathname !== "/messages") setOpen(true);
+
+  //   }
+  // );
+  // [#242526]
   return (
-    <div className={`sticky left-0 top-0 ${open ? "w-64" : "w-16"} duration-300 h-screen dark:bg-[#242526] bg-white dark:border-[#3A3B3C] border-r-[1px]`}>
+    <div className={`sticky left-0 top-0 ${open ? "w-64" : "w-16"} duration-300 h-screen dark:bg-black bg-white dark:border-[#3A3B3C] border-r-[1px]`}>
       <div className="flex items-center py-5 ">
         <Link 
           to="/"
@@ -137,7 +162,7 @@ function SideBar() {
               >
                 <div className='flex justify-start items-center w-fit'>
                   <span className="inline-flex relative items-center justify-center h-12 w-12 mr-1 text-2xl"><i className={`bx bx-${item.icon}`}>{((item.name == "Notifications" || item.name == "Messages") && !open) ? <div className='w-2 h-2 bg-red-500 rounded absolute top-2'></div> : null}</i></span>
-                  <span className={`text-base font-[550] ${open ? "block" : "hidden"} duration-300`}>{item.name}</span>
+                  <span className={`text-base font-[550] overflow-hidden ${open ? "block scale-100" : "hidden scale-0"} duration-300`}>{item.name}</span>
                 </div>
                 <span className={`${((item.name == "Notifications" || item.name == "Messages") && open) ? "" : "scale-0"} mr-6 text-sm bg-red-100 rounded-full ml-2 px-3 py-px text-red-500`}>5</span>
                 {/* {((item.name == "Notifications" || item.name == "Messages") && open) ? <span className="mr-6 text-sm bg-red-100 rounded-full float-right px-3 py-px text-red-500">5</span> : null} */}
@@ -166,7 +191,7 @@ function SideBar() {
                   ref={themeIcon}
                   className='bx bx-moon text-2xl duration-500'></i>
                   <span className={`text-base font-[550] ml-4 ${open ? "block" : "hidden"} duration-300`}>
-                  {themeMode == "dark"? "Light Mode" : "Dark Mode"}</span>
+                  {themeMode == "dark"? "Appearance" : "Appearance"}</span>
                 </div>
               </div>
             </label>
