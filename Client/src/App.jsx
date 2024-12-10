@@ -16,6 +16,7 @@ import UserProfile from "./components/UserProfile";
 import { UserProvider } from "./ContextApi/UserContext"; // Import UserProvider
 import { SocketContextProvider } from "./context/Socket";
 import Saved from "./pages/Saved";
+import Payment from "./pages/payment";
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
             <Route path="add-post" element={<CreatePost />} />
             <Route path="/messages" element={<Message />} />
             <Route path="/saved" element={<Saved />} />
+            <Route path="/payment" element={<Payment />} />
           </Route>
         </Routes>
       </Router>
