@@ -17,6 +17,7 @@ import { UserProvider } from "./ContextApi/UserContext"; // Import UserProvider
 import { SocketContextProvider } from "./context/Socket";
 import Saved from "./pages/Saved";
 import Payment from "./pages/payment";
+import Notifications from "./components/Notifications";
 
 function App() {
   return (
@@ -63,6 +64,14 @@ function App() {
               </ProtectedRoutes>
             }
           >
+            <Route
+            path="/notifications"
+            element={
+              <ProtectedRoutes>
+                <Notifications />
+              </ProtectedRoutes>
+            }
+          ></Route>
             <Route index element={<Home />} />
             <Route path="add-post" element={<CreatePost />} />
             <Route path="/messages" element={<Message />} />

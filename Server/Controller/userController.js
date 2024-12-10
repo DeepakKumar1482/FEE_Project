@@ -14,6 +14,7 @@ const upload = require('../middleware/multermiddleware.js');
 const cloudinary = require('../cloudinary/config.js'); // Path to your Cloudinary config file
 require('dotenv').config();
 const nodemailer = require('nodemailer');
+const Notifications = require("../models/notifications.model.js");
 const secretKey = process.env.secretKey;
 
 const UserRegistrationController = async (req, res) => {
@@ -41,6 +42,14 @@ const UserRegistrationController = async (req, res) => {
         const token = jwt.sign({ id: req.body.email }, secretKey, { expiresIn: '6d' });
 
         if (isEmailExist) {
+            const isExistInUserModel=await UserModel.findOne({email:req.body.email});
+            if(isExistInUserModel){
+                return res.status(200).send({
+                    success: false,
+                    check:true,
+                    message: 'Email already exists'
+                })
+            }
             const isProfileExist=await ProfileModel.findOne({email:req.body.email});
             console.log("This is isProfileExist -> ",isProfileExist);
             if(isProfileExist==null){
@@ -144,10 +153,27 @@ const LogincheckController = async(req, res) => {
         }else{
             user = await ProfileModel.findOne({ username:req.body.username });
         }
-        // if(flag){
-        //     user=await UserModel.findOne({email:req.body.username});
-        // }
         console.log("This is user ->",user);
+        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' });
+        var isRegistered;
+        if(!user){
+            isRegistered=await UserModel.findOne({email:req.body.username});
+            if(isRegistered){
+                return res.status(200).send({
+                    success: false,
+                    token,
+                    // message: "Please make your profile first",
+                    isRegisteredCheck:true
+                })
+            }else{
+                return res.status(200).send({
+                    success: false,
+                    message: "User मौजूद नहीं है |",
+                    isRegisteredCheck:false
+                })
+            }
+        }
+        // console.log("This is user ->",user);
         if (!user) {
             return res.status(200).send({
                 success: false,
@@ -171,13 +197,10 @@ const LogincheckController = async(req, res) => {
         if (!isMatch) {
             return res.status(200).send({
                 success: false,
+                isPasswordMatch: true,
                 message: wrongPasswordMessages[Math.floor(Math.random() * wrongPasswordMessages.length)]
             });
         }
-
-        
-        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' });
-
         res.status(200).send({
             success: true,
             // username,
@@ -196,9 +219,9 @@ const LogincheckController = async(req, res) => {
 };
 const GetUserController = async(req, res) => {
     try {
-        console.log("This is req -> ", req.body.username);
+        console.log("This is req -> ", req.body);
         const user = await ProfileModel.findOne({ username: req.body.username });
-        console.log("This is user -> ", user);
+        // console.log("This is user -> ", user);
         if (!user) {
             console.log("User not found");
             return res.status(200).send({
@@ -567,17 +590,26 @@ const MessageController = (req, res) => {
 const uploadcontroller = async(req, res) => {
     try {
         const { githubid, name, username, password, university, techStack,email } = req.body;
+        const user=await ProfileModel.findOne({username:username});
+        if(user){
+            return res.status(200).send({
+                success: false,
+                message: "Username already exists"
+            });
+        }
         // Check if all required fields are provided
         if (!githubid || !username || !password) {
+            console.log(githubid,username);
+            console.log("This is password ->",password);
             return res.status(400).json({
                 success: false,
                 message: 'All required fields must be filled',
             });
         }
 
-        if (!req.file) {
-            return res.status(400).send('No image provided!');
-        }
+        // if (!req.file) {
+        //     return res.status(400).send('No image provided!');
+        // }
         const result = await cloudinary.uploader.upload(req.file.path);
         const imageurl = result.url;
         console.log(imageurl);
@@ -604,7 +636,7 @@ const uploadcontroller = async(req, res) => {
             imageurl: imageurl,
             email
         });
-        console.log("This is new User -> ", newUser);
+        // console.log("This is new User -> ", newUser);
         await newUser.save();
 
         // Generate a token if needed (optional)
@@ -624,12 +656,16 @@ const uploadcontroller = async(req, res) => {
         //     })
         // res.json({ imageUrl: req.file.path });
     } catch (e) {
+        res.status(500).send({
+            success: false,
+            message: "Internal server error"
+        });
         console.log(e);
     }
 }
 const UpdateAboutController=async(req,res)=>{
     try{
-        const user=await ProfileModel.findOne({email:req.body.username});
+        const user=await ProfileModel.findOne({username:req.body.username});
         console.log(user);
         user.about=req.body.about;
         await user.save();
@@ -645,14 +681,62 @@ const UpdateAboutController=async(req,res)=>{
 const AddConnectionController = async(req, res) => {
     
     try {
-        const { username, connectionUsername } = req.body;
-        console.log("This is connectionUsername -> ",username, connectionUsername);
-        const user = await ProfileModel.findOne({username:username});
-        user.connections.push(connectionUsername);
+        const { sender, receiver } = req.body;
+        console.log("This is connectionUsername -> ",sender, receiver   );
+        const connectionData=await ProfileModel.findOne({username:receiver.username});
+        if(receiver.username===sender){
+            return res.status(200).send({
+                success:false,
+                message:"You cannot add yourself"
+            });
+        }
+        const user = await ProfileModel.findOne({username:sender});
+        const receiverNotifications=await Notifications.findOne({User:connectionData._id});
+        
+        if(receiverNotifications && receiverNotifications.notifications.length>0){
+            for(var i=0;i<receiverNotifications.notifications.length;i++){
+                console.log("This is receiverNotifications.notifications[i].userid -> ",receiverNotifications.notifications[i].userid);
+                console.log("This is user._id -> ",user._id);
+                if(receiverNotifications.notifications[i].userid.toString()===user._id.toString()){
+                    return res.status(200).send({
+                        success:false,
+                        message:"You have already sent a request"
+                    });
+                }
+            }
+
+        }
+        // console.log("This is the connection id who is going to be added -> ",connectionData._id);
+        if(connectionData.connections.includes(sender._id) || user.connections.includes(connectionData._id)){
+            return res.status(200).send({
+                success:false,
+                message:"Connection already exists"
+            });
+        }
+
+        const UserNotificationsArray=await Notifications.findOne({User:connectionData._id});
+        // console.log("This is UserNotificationsArray -> ",UserNotificationsArray);
+        if(!UserNotificationsArray){
+            const newNotification=new Notifications({
+                User:connectionData._id,
+                notifications:[]
+            });
+
+            newNotification.notifications.push({userid: user});
+            await newNotification.save();
+        }else{
+            console.log("Inside second Notification");
+            UserNotificationsArray.notifications.push({userid: user});
+            await UserNotificationsArray.save();
+        }
+        
+        // console.log("This is result -> ",result);
+        
+        // user.connections.push(connectionUsername);
         await user.save();
         res.status(200).send({
             success: true,
-            message: 'Connection added successfully'
+            message: 'Connection request sent successfully'
         });
     }
     catch (err) {
@@ -661,6 +745,77 @@ const AddConnectionController = async(req, res) => {
             success: false,
             message: "Internal server error"
         });
+    }
+}
+
+const GetNotificationsController = async(req, res) => {
+    try{
+        console.log(req.query.username);
+        const user=await ProfileModel.findOne({username:req.query.username});
+
+        const notifications=await Notifications.findOne({User:user._id}).populate({
+            path: 'notifications',
+            populate: {
+                path: "userid",
+                select: "username imageurl name"
+            }
+        })
+        if(!notifications){
+            return res.status(200).send({
+                success:false,
+                message:"No notifications"
+            });
+        }
+        console.log(notifications.notifications);
+        // console.log("This is isAccpeted -------------->",notifications.notifications[0].isAccepted);
+        res.status(200).send({
+            success:true,
+            data:notifications.notifications,
+            // isAccepted:notifications.notifications[0].isAccepted
+        });
+    }catch(e){
+        console.log(e);
+        res.status(500).send({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+}
+const AcceptConnectionController=async(req,res)=>{
+    try{
+        const {sender,reciever,notificationid}=req.body;
+        // const Notification=await Notifications.findOne({notifications._id:notificationid});
+        
+        const user=await ProfileModel.findOne({username:sender});
+        user.connections.push(reciever);
+        console.log("This is Notification id",notificationid)
+        await user.save();
+        console.log("This is sender id",user._id);
+        console.log("This is reciever id",reciever)
+        const connectionUser=await ProfileModel.findOne({_id:reciever});
+        console.log("This is connectionUser -> ",connectionUser)
+        connectionUser.connections.push(user._id);
+        await connectionUser.save();
+
+        
+        
+        const result = await Notifications.findOneAndUpdate(
+            { User: user._id }, // Find the document by user _id
+            { $pull: { notifications: { _id: notificationid } } } ,// Remove the specific object in the array
+            { new: true } 
+          );
+          console.log("This is result -> ",result);
+        //   await result.save();
+        res.status(200).send({
+            success:true,
+            message:"Connection added successfully"
+        })
+    }catch(e){
+        console.log(e)
+        res.status(500).send({
+            success: false,
+            message: "Internal server error"
+        })
     }
 }
 module.exports = {
@@ -677,5 +832,7 @@ module.exports = {
     uploadcontroller,
     GetUserController,
     UpdateAboutController,
-    AddConnectionController
+    AddConnectionController,
+    GetNotificationsController,
+    AcceptConnectionController
 };

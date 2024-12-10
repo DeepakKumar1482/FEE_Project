@@ -14,13 +14,15 @@ const Profile = () => {
   const navigate = useNavigate();
   // const [imageurl, setImageUrl] = useState("");
   const [githubid, setGithubName] = useState(null);
-  // const [userName, setUserName] = useState(null);
+  const [userName, setUserName] = useState(null);
   // const [isUserExist, setIsUserExist] = useState(0);
   // const [val, setval] = useState({});
   // const [temp, settemp] = useState(0);
   // const [flag, setflag] = useState(0);
   const { userData } = useUser();
   const { email, password } = userData;
+  console.log("this is email -> ", email);
+  console.log("This is password -> ", password);
   const [loading, setloading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -172,10 +174,10 @@ const Profile = () => {
   }
 
   const uploaduser = async (values, e) => {
-    if(!userData.token){
-      message.error("Please Register first");
-      return;
-    }
+    // if(!userData.token){
+    //   message.error("Please Register first");
+    //   return;
+    // }
     const nameCheck=validateName(values.name);
     if(!nameCheck){
       return;
@@ -207,6 +209,8 @@ const Profile = () => {
     formData.append("techStack", values.techStack);
     formData.append("githubid", githubid);
     formData.append("university", values.university);
+    formData.append("Email", email);
+    formData.append("Password", password);
     console.log("This is Form data -> ",formData);
     // name, username, password, university, techStack
     try {
@@ -220,6 +224,7 @@ const Profile = () => {
         }
       );
       if (res.data.success) {
+        
         localStorage.setItem("token", userData.token);
         localStorage.setItem("username", values.username);
         console.log(res.data.token);

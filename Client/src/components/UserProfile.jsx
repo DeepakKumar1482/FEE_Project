@@ -11,6 +11,7 @@ const UserProfile = () => {
   const [languageStats, setLanguageStats] = useState({}); // To hold aggregated language data
   const[about,setAbout]=useState("");
   const[Edit,setEdit]=useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const param=useParams();
   const handleSplitTechStack = () => {
     const techStackArray = techStack.split(",").map((item) => item.trim()); // Split by ',' and trim whitespace
@@ -26,7 +27,7 @@ const UserProfile = () => {
 
   const SubmitData=async()=>{
     try{
-      if(currUser===userData.data.email){
+      if(currUser===userData.data.username){
         console.log(currUser,userData.data.email);
       setEdit(!Edit);
 
@@ -34,6 +35,8 @@ const UserProfile = () => {
       if(Edit){
       const res=await axios.post("http://localhost:8080/api/user/updateabout",{username:currUser,about:about});
       if(res.data.success){
+        // setIsSaved(true);
+        fetchUserDetails();
         message.success("Data Updated Successfully");
       }
     }
@@ -41,28 +44,31 @@ const UserProfile = () => {
       console.log(e);
     }
   }
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      if (!currUser) {
-        console.error("Username is not available in localStorage.");
-        return;
-      }
 
-      const user = { email: currUser };
-      try {
-        const res = await axios.post("http://localhost:8080/api/user/getuser", user);
-        setUserData(res.data);
-        setTechStack(res.data.data.techStack[0]);
-        console.log("This is use data -->",res.data);
-        // Fetch GitHub data based on GitHub ID
-        await fetchGitHubData(res.data.data.githubid);
-      } catch (err) {
-        console.error("Error fetching user details:", err);
-      }
-    };
+  const fetchUserDetails = async () => {
+    if (!currUser) {
+      console.error("Username is not available in localStorage.");
+      return;
+    }
+
+    const user = { username: param };
+    try {
+      console.log("This is user data -> ",user.username.username);
+      const res = await axios.post("http://localhost:8080/api/user/getuser", {username:user.username.username});
+      console.log("This is user profile data -> ",res)
+      setUserData(res.data);
+      setTechStack(res.data.data.techStack[0]);
+      console.log("This is use data -->",res.data);
+      // Fetch GitHub data based on GitHub ID
+      await fetchGitHubData(res.data.data.githubid);
+    } catch (err) {
+      console.error("Error fetching user details:", err);
+    }
+  };
+  useEffect(() => { 
 
     fetchUserDetails();
-  }, [currUser]);
+  }, [currUser,isSaved]);
 
   const fetchGitHubData = async (githubId) => {
     try {
@@ -110,9 +116,11 @@ const UserProfile = () => {
 
   const AddConnection=async()=>{
     try{
-      const res=await axios.post("http://localhost:8080/api/user/addconnection",{username:currUser,connection:param});
+      const res=await axios.post("http://localhost:8080/api/user/addconnection",{sender:currUser,receiver:param});
       if(res.data.success){
         message.success("Connection Added Successfully");
+      }else{
+        message.error(res.data.message);
       }
     }catch(e){
       console.log(e);
