@@ -2,15 +2,15 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const commentSchema = new Schema({
-    username: {
+    userId: {
         type: Schema.Types.ObjectId,
-        ref: "User"
+        ref: "UserProfile"
     },
     text: {
         type: String,
         trim: true,
         required: true
-    }
+    },
 },{timestamps: true});
 
 const Comment = mongoose.model("Comment", commentSchema);

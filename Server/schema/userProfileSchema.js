@@ -36,11 +36,11 @@ const userProfileSchema = new mongoose.Schema({
     },
     posts: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'postModel',
+        ref: 'Post',
     }],
     savedposts: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'postModel',
+        ref: 'Post',
     }],
     connections: {
         type: [String],
@@ -54,6 +54,10 @@ const userProfileSchema = new mongoose.Schema({
     about: {
         type: String,
     },
+    likedPosts:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post',
+    }]
 });
 
 const ProfileModel = mongoose.model('UserProfile', userProfileSchema);

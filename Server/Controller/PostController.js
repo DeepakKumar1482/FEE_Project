@@ -1,8 +1,10 @@
-const { getFirestore, collection, addDoc, where, query, getDocs, updateDoc, setDoc } = require("firebase/firestore");
-const { db } = require('../Firebase/config.js');
+// const { getFirestore, collection, addDoc, where, query, getDocs, updateDoc, setDoc } = require("firebase/firestore");
+// const { db } = require('../Firebase/config.js');
+const Comment = require("../models/comments.model.js");
 const postModel = require("../schema/postSchema.js");
-const app = getFirestore(db);
-const postsRef = collection(app, "posts");
+const ProfileModel = require("../schema/userProfileSchema.js");
+// const app = getFirestore(db);
+// const postsRef = collection(app, "posts");
 
 // const { db } = require('../Firebase/config.js');
 // const app = getFirestore(db);
@@ -17,7 +19,7 @@ const getPostsController = async(req, res) => {
         const PostsList = await postModel.find().populate({
             path: "userid",
             select: "username name imageurl",
-        });
+        });
        
         console.log(PostsList);
         res.status(200).json({
@@ -33,9 +35,12 @@ const getPostsController = async(req, res) => {
 const likePost = async(req, res) => {
     try {
         const userId = req.user._id;
+        // console.log(userId, "like post");
         const {postId} = req.body;
     
-        const post = await postModel.findOne(postId);
+        const post = await postModel.findById(postId);
+        const user = await ProfileModel.findById(userId);
+        console.log(user);
         if(!post){
             return res.status(400).json(
                 {
@@ -44,14 +49,31 @@ const likePost = async(req, res) => {
                 }
             )
         }
-    
+        
+        const isAlreadyLiked = post.likes.includes(userId);
+        if(isAlreadyLiked){
+            post.likes.pull(userId);
+            user.likedPosts.pull(postId);
+            await post.save();
+            await user.save();
+            return res.status(200).json(
+                {
+                    success: true,
+                    message: "Post disliked successfully",
+                    likesCount: post.likes.length
+                }
+            )
+        }
+        user.likedPosts.push(postId);
         post.likes.push(userId);
         await post.save();
+        await user.save();
 
         return res.status(200).json(
             {
                 success: true,
-                message: "Post liked successfully"
+                message: "Post liked successfully",
+                likesCount: post.likes.length
             }
         )
     } catch (error) {
@@ -64,4 +86,171 @@ const likePost = async(req, res) => {
         )
     }
 }
-module.exports = getPostsController;
+
+const bookmark = async(req, res) => {
+    try {
+        const {postId} = req.body;
+        const userId = req.user._id;
+        const user = await ProfileModel.findById(userId);
+        
+        const isAlreadySaved = user.savedposts.includes(postId);
+        console.log(isAlreadySaved)
+        if(isAlreadySaved){
+            user.savedposts.pull(postId);
+            await user.save();
+            return res.status(200).json(
+                {
+                    success: true,
+                    message: "Saved post removed"
+                }
+            )
+        }
+        user.savedposts.push(postId);
+        await user.save();
+        return res.status(200).json(
+            {
+                success: true,
+                message: "Saved post successfully"
+            }
+        )
+
+    } catch (error) {
+        return res.status(500).json(
+            {
+                success: false,
+                message: "Error while saving post"
+            }
+        )
+    }
+}
+
+const getSavedPosts = async(req, res) => {
+    try {
+        const userId = req.user._id;
+        const savedPosts = await ProfileModel.findById(userId).populate({
+            path: "savedposts",
+            populate: {
+                path: "userid",
+                select: "username name imageurl",
+            }
+        });
+        if(!savedPosts){
+            return res.status(404).json({
+                success: false,
+                message: "No saved posts"
+            })
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Saved post fetched successfully",
+            savedPosts: savedPosts.savedposts
+        })
+        
+    } catch (error) {
+        return res.status(500).json(
+            {
+                success: false,
+                message: "Error while saving post"
+            }
+        )
+    }
+}
+
+const addComment = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { text, postId } = req.body;
+
+        if(!text){
+            return res.status(401).json(
+                {
+                    success: false,
+                    message: "Please add a comment."
+                }
+            )
+        }
+        const post = await postModel.findById(postId);
+        if(!post){
+            return res.status(404).json(
+                {
+                    success: false,
+                    message: "Invalid Post ID"
+                }
+            )
+        }
+
+        const newComment = new Comment({
+            userId,
+            text
+        })
+        await newComment.save();
+
+        const addedCommentData = await newComment.populate({
+            path: "userId",
+            select: "username name imageurl"
+        })
+        if(!addedCommentData){
+            return res.status(403).json({
+                success: false,
+                message: "Error saving comment"
+            })
+        }
+
+        post.comments.push(newComment);
+        await post.save();
+
+        return res.status(200).json(
+            {
+                success: true,
+                message: "Commented on the post successfully",
+                addedCommentData
+            }
+        )
+
+    } catch (error) {
+        return res.status(500).json(
+            {
+                success: false,
+                message: "Error while commenting on the post"
+            }
+        )
+    }
+}
+
+const getComment = async (req, res) => {
+    try {
+        const {postId} = req.body;
+        const post = await postModel.findById(postId).populate({
+            path: "comments",
+            populate: {
+                path: "userId",
+                select: "username name imageurl"
+            },
+            options: { sort: { createdAt: -1 } },
+        })
+        if(!post){
+            return res.status(200).json(
+                {
+                    success: false,
+                    message: "No comments found"
+                }
+            )
+        }
+        return res.status(200).json(
+            {
+                success: true,
+                message: "Fetched Comments successfully",
+                commentData: post.comments
+            }
+        )
+    } catch (error) {
+        return res.status(500).json(
+            {
+                success: false,
+                message: "Error while fetching comments"
+            }
+        )
+    }
+}
+
+module.exports = {getPostsController, likePost, bookmark, getSavedPosts, addComment, getComment};

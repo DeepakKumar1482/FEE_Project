@@ -192,13 +192,12 @@ const LogincheckController = async(req, res) => {
             success: false,
             message: "Internal server error"
         });
-        console.log("first")
     }
 };
 const GetUserController = async(req, res) => {
     try {
-        console.log("This is req -> ", req.body.email);
-        const user = await ProfileModel.findOne({ email: req.body.email });
+        console.log("This is req -> ", req.body.username);
+        const user = await ProfileModel.findOne({ username: req.body.username });
         console.log("This is user -> ", user);
         if (!user) {
             console.log("User not found");

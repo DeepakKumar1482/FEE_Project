@@ -15,6 +15,7 @@ import Message from "./components/Message";
 import UserProfile from "./components/UserProfile";
 import { UserProvider } from "./ContextApi/UserContext"; // Import UserProvider
 import { SocketContextProvider } from "./context/Socket";
+import Saved from "./pages/Saved";
 
 function App() {
   return (
@@ -64,6 +65,7 @@ function App() {
             <Route index element={<Home />} />
             <Route path="add-post" element={<CreatePost />} />
             <Route path="/messages" element={<Message />} />
+            <Route path="/saved" element={<Saved />} />
           </Route>
         </Routes>
       </Router>

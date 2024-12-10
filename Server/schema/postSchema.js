@@ -13,6 +13,14 @@ const postSchema = new mongoose.Schema({
     tech: {
         type: [String],
     },
+    likes:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserProfile"
+    }],
+    comments:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment"
+    }],
     userid:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'UserProfile'

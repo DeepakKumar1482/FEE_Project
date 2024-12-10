@@ -16,7 +16,7 @@ function Layout() {
   return (
       <div className='flex justify-between'>
           <SideBar/>
-          <main className='w-full flex justify-center '>
+          <main className='w-full flex justify-center'>
               <Outlet/>
           </main>
           {/* <Footer/> */}

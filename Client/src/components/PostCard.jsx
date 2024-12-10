@@ -3,17 +3,40 @@ import { Link, useNavigate } from "react-router-dom";
 import { ModalPost } from "./index";
 import axios from "axios";
 import ImageCarousel3 from "./ImageCarousel3";
+import { useUser } from "../ContextApi/UserContext";
 function PostCard() {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalPostOpen, setIsModalPostOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const myRef = useRef(null);
   const [flag, setflag] = useState(0);
+  const likeRef = useRef(null);
+  const bookmarkRef = useRef(null);
   const [propdata, setpropdata] = useState({});
   const Navigate=useNavigate();
+  const {userLikedPosts, setuserlikedPosts, userSavedPosts, setuserSavedPosts} = useUser();
+  // const [userSavedPosts, setuserSavedPosts] = useState([]);
+  const [isLoading, setisLoading] = useState(false);
+
   useEffect(() => {
     fetchPosts();
-  }, []);
+    console.log(userLikedPosts, "liked posts")
+    console.log(userSavedPosts, "saved posts")
+
+  }, [userLikedPosts, userSavedPosts]);
+  useEffect(() => {
+    const apiCall = async() => {
+      const response = await axios.post('/api/user/getuser', {username: localStorage.getItem('username')})
+      console.log(response.data);
+      if(response.data.success){
+        console.log("hi:", response.data.data.likedPosts)
+        setuserlikedPosts(response.data.data.likedPosts)
+        setuserSavedPosts(response.data.data.savedposts);
+      }
+    }
+    apiCall();
+    
+  },[]);
 
   useEffect(() => {
     if (posts.length > 0) {
@@ -25,17 +48,14 @@ function PostCard() {
         setIsOpen(false);
       }
     }
-  }, [posts]);
+  }, [isLoading]);
+
+
+
   const fetchPosts = async () => {
     try {
       const response = await axios.get(
         "/api/posts/getposts"
-        // ,
-        // {
-        //   headers: {
-        //     Authorization: "Bearer " + localStorage.getItem("token"),
-        //   },
-        // }
       );
       const postsData = response.data.posts;
       // console.log(postsData[0]);
@@ -60,6 +80,34 @@ function PostCard() {
   const GetUserProfile = (values) => {
     return Navigate("/userprofile/"+values);
   }
+
+  const likePostFunction = async(e, postId) => {
+    const token = localStorage.getItem("token");
+    const response = await axios.post('/api/posts/like-post', {postId}, {headers: {Authorization: 'Bearer '+ token}})
+    // likeRef.current.classList.toggle("bxs-heart");
+    // console.log("like: ", likeRef.current);
+    if(response.data.success){
+      console.log(response.data.message)
+    }
+    else{
+      message.error(response.data.message)
+    }
+  }
+  const savePostFunction = async(postId) => {
+    const token = localStorage.getItem("token");
+    const response = await axios.post('/api/posts/save-post', {postId}, {headers: {Authorization: 'Bearer '+ token}})
+    if(response.data.success){
+      console.log(response.data.message)
+    }
+    else{
+      message.error(response.data.message)
+    }
+  }
+  useEffect(() => {
+    if(posts.length > 0){
+      setisLoading(true);
+    }
+  },[posts])
   const card = () => {
     return posts.map((postdata, key) => (
       <div
@@ -130,6 +178,7 @@ function PostCard() {
         {/* caption */}
         <div className="flex items-center justify-between pr-0">
           <p className="dark:text-white text-gray-800">
+          {/* //TODO: Timings of posts */}
             {/* <span>{postdata.Time.time}</span>{" "}
             <span>{postdata.Time.date}</span> */}
           </p>
@@ -152,15 +201,18 @@ function PostCard() {
             className="bx bx-message-rounded cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]"
           ></i>
           <i
-            className="bx bx-heart cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]"
+            className={`bx bx-heart cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85] ${userLikedPosts?.includes(postdata._id) ? "bxs-heart" : ""}`}
+            ref={likeRef}
             onClick={(e) => {
-              e.currentTarget.classList.toggle("bxs-heart");
-            }}
+                e.currentTarget.classList.toggle("bxs-heart");
+                likePostFunction(e, postdata._id)
+              }}
           ></i>
           <i
-            className="bx bx-bookmark cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85]"
+            className={`bx bx-bookmark cursor-pointer dark:hover:text-gray-300 hover:text-gray-500 active:scale-[.85] ${userSavedPosts?.includes(postdata._id) ? "bxs-bookmark": ""}`}
             onClick={(e) => {
               e.currentTarget.classList.toggle("bxs-bookmark");
+              savePostFunction(postdata._id);
             }}
           ></i>
         </div>{" "}

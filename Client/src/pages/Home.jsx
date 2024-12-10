@@ -4,7 +4,6 @@ import { useSocket } from '../context/Socket';
 
 function Home() {
   const {socketInstance, username} = useSocket();
-  const [message, setMessage] = useState('');
   console.log(socketInstance, "home compo")
   // useEffect(() => {
   //   console.log(socketInstance, "home compo inside")
@@ -18,7 +17,7 @@ function Home() {
   // }, [socketInstance])
 
   return (
-    <div className=''>
+    <div className='flex flex-col items-center w-full'>
         <PostCard/>
     </div>
   )
