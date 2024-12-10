@@ -54,6 +54,7 @@ const userProfileSchema = new mongoose.Schema({
     about: {
         type: String,
     },
+    
 });
 
 const ProfileModel = mongoose.model('UserProfile', userProfileSchema);

@@ -147,8 +147,13 @@ const Signup = () => {
         setTempToken(res.data.token);
         setOtpSent(true);
       } else {
+        if(res.data.check){
+          message.error("Already have an account");
+          navigate("/signin");
+        }else{
         navigate("/signin");
         message.error(res.data.message);
+        }
       }
     } catch (err) {
       console.log(err);
@@ -192,10 +197,22 @@ const Signup = () => {
         localStorage.setItem("username", res.data.user.username);
         navigate("/");
       } else {
-        message.error(res.data.message);
+        if(res.data.isPasswordMatch){
+          return message.error(res.data.message);
+        }
+        if(res.data.isRegisteredCheck){
+          setUserData({ email, password });
+          setUserData((prev)=>{return {...prev,token:res.data.token}});
+          navigate("/profile");
+        }else{
+          message.error("Please Register first");
+          navigate("/signup");
+        }
+        // message.error(res.data.message);
       }
     } catch (e) {
       message.error(e.message);
+      console.log(e);
     } finally {
       setLoading(false);
     }
