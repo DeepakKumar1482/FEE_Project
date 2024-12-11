@@ -11,22 +11,6 @@ function Chat({conversation}) {
   const {socketInstance, username} = useSocket();
   const chatRef = useRef(null); 
 
-  // const fetchPages = async(pageparam) => {
-  //   const token = localStorage.getItem("token");
-  //   const response = await axios.post('/api/message/getMessage', {
-  //     param: {
-  //       cursor: pageparam,
-  //       limit : 15
-  //     },
-  //     headers: { Authorization : 'Bearer ' + token}
-  //   }, {receiver: conversation._id},)
-  //   return response.data;
-  // }
-
-  // const {} = useInfiniteQuery({
-  //   queryKey: ['messages'],
-  //   queryFn: () =>
-  // });
 
   useEffect(() => {
     const socketUser = conversation.username;
@@ -40,13 +24,14 @@ function Chat({conversation}) {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.post("/api/message/getMessage", {receiver : conversation._id}, {headers: { Authorization : 'Bearer ' + token}})
+        console.log("response in chat component", response.data);
         setMessages(response.data.chats);
       } catch (error) {
         console.log(error);
       }
     }
     getMessage();
-  },[])
+  },[conversation])
 
   useEffect(() => {
     if(socketInstance){

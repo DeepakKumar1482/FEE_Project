@@ -54,6 +54,7 @@ const Message = () => {
   const {username, socketInstance} = useSocket();
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [conversation, setConversation] = useState([]);
+  const [userConnections, setUserConnections] = useState([]);
   const [receiver, setReceiver] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
@@ -80,13 +81,52 @@ const Message = () => {
         console.log(error);
       }
     }
+    const getUserConnections = async() => {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("/api/user/getConnections",{ headers: { "Authorization": `Bearer ${token}`}})
+        if(response.data.success){
+            setUserConnections(response.data.connections)
+            console.log(response.data.connections , " connected successfully");
+        }
+        else {
+            // message.error(response.data.message);
+            
+        }
+      }
+    getUserConnections();
     getConversation();
   },[])
+
+  const fetchConnectionConverstaion = async() => {
+    const response = await axios.post("")
+  }
+
+  
 
 
   return (
       <div className="w-full flex">
           <div className="w-1/4 border-r-[1px] dark:border-gray-600 border-gray-300">
+
+            <div className='flex flex-col p-5 pt-2 items-center gap-2'>
+                <h2 className='text-gray-800 dark:text-white text-lg'>Your Connections</h2>
+                <div className='flex overflow-x-scroll w-full gap-3'>
+                    {userConnections.map((singleConnection) => (
+                        <div onClick={() => {
+                            setSelectedConversation(singleConnection)
+                            setReceiver(singleConnection.username)
+                        }} className='flex flex-col items-center cursor-pointer' key={singleConnection._id}>
+                            <div className='h-20 w-20'>
+                                <img className='h-full w-full rounded-full' src={singleConnection.imageurl} alt="" />
+                            </div>
+                            <div>
+                                <p className='text-gray-800 dark:text-white text-wrap break-words whitespace-normal text-center'>{singleConnection.name}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
               {isLoading ? (
                   <div className="w-full p-4 space-y-4 divide-y divide-gray-200 rounded animate-pulse dark:divide-gray-700 md:p-6 ">
                       {arr.map((ele, index) => (

@@ -18,6 +18,7 @@ import { SocketContextProvider } from "./context/Socket";
 import Saved from "./pages/Saved";
 import Payment from "./pages/payment";
 import Notifications from "./components/Notifications";
+import { ParticlesComponent } from "./components";
 
 function App() {
   return (

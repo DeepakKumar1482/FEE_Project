@@ -154,7 +154,7 @@ const LogincheckController = async(req, res) => {
             user = await ProfileModel.findOne({ username:req.body.username });
         }
         console.log("This is user ->",user);
-        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' });
+        const token = jwt.sign({ id: user.username }, secretKey, { expiresIn: '6d' });
         var isRegistered;
         if(!user){
             isRegistered=await UserModel.findOne({email:req.body.username});
@@ -818,7 +818,46 @@ const AcceptConnectionController=async(req,res)=>{
         })
     }
 }
+
+const getConnections = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const userConnections = await ProfileModel.findById(userId);
+        if(userConnections.connections.length == 0){
+            return res.status(404).json({
+                success: false,
+                message: "No connections were found"
+            })
+        }
+        // const connData = await ProfileModel.findById(userConnections.connections[0]).select("username name imageurl");
+        // console.log("first", connData);
+        const finalConnections = [];
+        for(let i = 0; i < userConnections.connections.length; i++){
+            const connData = await ProfileModel.findById(userConnections.connections[i]).select("username name imageurl");
+            finalConnections.push(connData);
+        }
+        // const data = await userConnections.connections.map(async(connectionid, index) => {
+        //     const connData = await ProfileModel.findById(connectionid).select("username name imageurl");
+        //     console.log(connData, "inside");
+        //     finalConnections[index] = connData;
+        // })
+        console.log(finalConnections, "final");
+        return res.status(200).json({
+            success: true,
+            message: "Fetched connections succcessfully",
+            connections: finalConnections
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Error while fetching connections"
+        })
+    }
+}
+
 module.exports = {
+    getConnections,
     UserRegistrationController,
     VerifyOtpController,
     IsUserExist,

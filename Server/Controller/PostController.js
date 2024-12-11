@@ -1,30 +1,27 @@
-// const { getFirestore, collection, addDoc, where, query, getDocs, updateDoc, setDoc } = require("firebase/firestore");
-// const { db } = require('../Firebase/config.js');
 const Comment = require("../models/comments.model.js");
 const postModel = require("../schema/postSchema.js");
 const ProfileModel = require("../schema/userProfileSchema.js");
-// const app = getFirestore(db);
-// const postsRef = collection(app, "posts");
 
-// const { db } = require('../Firebase/config.js');
-// const app = getFirestore(db);
-// const postsRef = collection(app, "posts");
-// const postModel = require("../schema/postSchema.js");
 const getPostsController = async(req, res) => {
     try {
-        // const postsSnapshot = await getDocs(postsRef);
-        // const postsList = postsSnapshot.docs.map((doc) => ({
-        //     ...doc.data(),
-        // }));
-        const PostsList = await postModel.find().populate({
+        const {page = 1, limit = 10} = req.query;
+        const PostsList = await postModel
+        .find()
+        .sort({createdAt : -1})
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit))
+        .populate({
             path: "userid",
             select: "username name imageurl",
         });
-       
-        console.log(PostsList);
+       const totalPosts = await postModel.countDocuments();
+       console.log(totalPosts);
+       const hasNextPage = (page*limit) < totalPosts;
+        console.log(PostsList[0]);
         res.status(200).json({
             success: true,
-            posts: PostsList
+            posts: PostsList,
+            hasNextPage
         });
     } catch (error) {
         console.log(error);
@@ -37,10 +34,11 @@ const likePost = async(req, res) => {
         const userId = req.user._id;
         // console.log(userId, "like post");
         const {postId} = req.body;
-    
+        console.log("post id: " + postId);
+        // 67589ab4c1efbe785c6800b9
         const post = await postModel.findById(postId);
         const user = await ProfileModel.findById(userId);
-        console.log(user);
+        console.log("inside like post 1",post.likes.length);
         if(!post){
             return res.status(400).json(
                 {
@@ -51,11 +49,13 @@ const likePost = async(req, res) => {
         }
         
         const isAlreadyLiked = post.likes.includes(userId);
+        console.log("is already liked", isAlreadyLiked);
         if(isAlreadyLiked){
             post.likes.pull(userId);
             user.likedPosts.pull(postId);
             await post.save();
             await user.save();
+            console.log("inside like post 2",post.likes.length);
             return res.status(200).json(
                 {
                     success: true,
@@ -68,6 +68,8 @@ const likePost = async(req, res) => {
         post.likes.push(userId);
         await post.save();
         await user.save();
+        console.log("inside like post 3",post.likes.length);
+
 
         return res.status(200).json(
             {
@@ -220,7 +222,10 @@ const addComment = async (req, res) => {
 const getComment = async (req, res) => {
     try {
         const {postId} = req.body;
-        const post = await postModel.findById(postId).populate({
+        const {page = 1, limit = 10} = req.query;
+        const post = await postModel
+        .findById(postId)
+        .populate({
             path: "comments",
             populate: {
                 path: "userId",
