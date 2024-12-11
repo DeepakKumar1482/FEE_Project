@@ -18,7 +18,7 @@ import { SocketContextProvider } from "./context/Socket";
 import Saved from "./pages/Saved";
 import Payment from "./pages/payment";
 import Notifications from "./components/Notifications";
-
+import SearchComponent from "./components/Searching";
 function App() {
   return (
     <UserProvider>
@@ -33,14 +33,7 @@ function App() {
               </PublicRoute>
             }
           />
-          <Route
-            path="/userprofile/:username"
-            element={
-              <ProtectedRoutes>
-                <UserProfile />
-              </ProtectedRoutes>
-            }
-          />
+          
           <Route
             path="/:signin"
             element={
@@ -72,8 +65,15 @@ function App() {
               </ProtectedRoutes>
             }
           ></Route>
+          <Route
+            path="/userprofile/:username"
+            element={
+                <UserProfile />
+            }
+          />
             <Route index element={<Home />} />
             <Route path="add-post" element={<CreatePost />} />
+            <Route path="search" element={<SearchComponent />} />
             <Route path="/messages" element={<Message />} />
             <Route path="/saved" element={<Saved />} />
             <Route path="/payment" element={<Payment />} />

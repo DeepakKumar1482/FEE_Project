@@ -1,5 +1,5 @@
 const express = require('express');
-const { IsUserExist, CreatePostController, LogincheckController, MessageController, uploadcontroller, UserRegistrationController, VerifyOtpController, SendOtpController, VerifyForgotOtpController, ResetPasswordController, GetUserController, UpdateAboutController, AddConnectionController, GetNotificationsController, AcceptConnectionController } = require('../Controller/userController.js');
+const { IsUserExist, CreatePostController, LogincheckController, MessageController, uploadcontroller, UserRegistrationController, VerifyOtpController, SendOtpController, VerifyForgotOtpController, ResetPasswordController, GetUserController, UpdateAboutController, AddConnectionController, GetNotificationsController, AcceptConnectionController, RejectConnectionController, GetAllUserController } = require('../Controller/userController.js');
 const authmiddleware = require('../middleware/authmiddleware.js');
 const upload = require('../middleware/multermiddleware.js');
 const router = express.Router();
@@ -17,6 +17,8 @@ router.post('/logincheck', LogincheckController);
 router.post('/addconnection',AddConnectionController);
 router.get('/getNotifications',GetNotificationsController);
 router.post('/AcceptConnection',AcceptConnectionController);
+router.post('/RejectConnection',RejectConnectionController);
+router.get('/getallusers',GetAllUserController);
 // router.post('/message', authmiddleware, MessageController);
 router.post('/upload', upload.single('image'), uploadcontroller);
 module.exports = router

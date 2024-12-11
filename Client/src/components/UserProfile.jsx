@@ -3,6 +3,9 @@ import axios from "axios";
 import {message} from "antd";
 import PostCard from './PostCard.jsx'
 import { useParams } from "react-router-dom";
+import Loader from "./Loader/loader.jsx";
+import Saved from "../pages/Saved.jsx";
+import ModalPost from "./ModalPost.jsx";
 const UserProfile = () => {
   const [userData, setUserData] = useState(null); // Start with `null` to handle loading state
   const [currUser, setCurrUser] = useState(localStorage.getItem("username")); // Retrieve `username` from localStorage
@@ -13,6 +16,10 @@ const UserProfile = () => {
   const[Edit,setEdit]=useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const param=useParams();
+  const [isModalPostOpen, setIsModalPostOpen] = useState(false);
+  const[loading,setLoading]=useState(false);
+  const[propdata,setPropData]=useState({});
+  const [savedPosts, setSavedPosts] = useState([]); 
   const handleSplitTechStack = () => {
     const techStackArray = techStack.split(",").map((item) => item.trim()); // Split by ',' and trim whitespace
     return techStackArray;
@@ -53,22 +60,37 @@ const UserProfile = () => {
 
     const user = { username: param };
     try {
+      setLoading(true);
       console.log("This is user data -> ",user.username.username);
       const res = await axios.post("http://localhost:8080/api/user/getuser", {username:user.username.username});
-      console.log("This is user profile data -> ",res)
+      console.log("This is user profile data -> ",res.data)
       setUserData(res.data);
       setTechStack(res.data.data.techStack[0]);
       console.log("This is use data -->",res.data);
       // Fetch GitHub data based on GitHub ID
       await fetchGitHubData(res.data.data.githubid);
+      setLoading(false);
     } catch (err) {
+      setLoading(false);
       console.error("Error fetching user details:", err);
     }
   };
-  useEffect(() => { 
 
+  const getPosts=async()=>{
+    try{
+      const user = param.username;
+      const res=await axios.get(`http://localhost:8080/api/posts/getUserProfileposts?username=${user}`);
+      if(res.data.success){
+        setSavedPosts(res.data.UserPosts);
+      }
+    }catch(e){
+      console.log(e);
+    }
+  }
+  useEffect(() => { 
+    getPosts();
     fetchUserDetails();
-  }, [currUser,isSaved]);
+  }, [param]);
 
   const fetchGitHubData = async (githubId) => {
     try {
@@ -118,7 +140,7 @@ const UserProfile = () => {
     try{
       const res=await axios.post("http://localhost:8080/api/user/addconnection",{sender:currUser,receiver:param});
       if(res.data.success){
-        message.success("Connection Added Successfully");
+        message.success("Connection request sent Successfully");
       }else{
         message.error(res.data.message);
       }
@@ -128,19 +150,19 @@ const UserProfile = () => {
 }
 
   if (!userData) {
-    return <p>Loading user data...</p>; // Show a loading state while data is being fetched
+    return <Loader/>; // Show a loading state while data is being fetched
   }
   return (
     <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen p-4 sm:p-8">
       {/* Profile Background Image */}
-      <div
+      {/* <div
         className="relative w-full h-48 bg-cover bg-center rounded-lg shadow-lg overflow-hidden"
         style={{ backgroundImage: "url('https://via.placeholder.com/1200x300')" }}
       >
         <button className="absolute bottom-2 right-2 bg-gray-200 dark:bg-gray-800 text-sm px-4 py-1 rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-700">
           Change Cover
         </button>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="flex flex-col space-y-6 mt-6">
@@ -316,12 +338,44 @@ const UserProfile = () => {
 
         {/* Posts Section */}
         <div className="bg-white dark:bg-gray=800 rounded-lg shadow-lg p=6">
-          {/* <PostCard/> */}
+        {/* <Saved/> */}
+
+        <div className="flex flex-col items-center gap-5 w-[75%] py-5 px-3 max-h-screen">
+                <h1 className="text-4xl dark:text-white text-gray-800">
+                    All posts
+                </h1>
+                <div className="flex flex-col gap overflow-y-scroll w-full h-full">
+                    <div className="flex flex-wrap w-full h-full">
+                        {savedPosts.map((savedPost, index) => (
+                            <div
+                                key={index}
+                                className="w-1/3 h-[50%] border-[3px] dark:border-black border-white cursor-pointer hover:opacity-75 active:opacity-60"
+                                onClick={() => {
+                                    setPropData(savedPost);
+                                    setIsModalPostOpen(true);
+                                }}
+                            >
+                                <img
+                                    src={savedPost.imageUrls[0]}
+                                    className="w-full h-full object-cover bg-gray-200 dark:bg-white"
+                                    alt=""
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+            {isModalPostOpen && (
+                <ModalPost
+                    data={propdata}
+                    onClose={() => {
+                    document.body.style.overflowY = "visible";
+                    setIsModalPostOpen(false);
+                    }}
+                />
+            )}
         </div>
       </div>
-      {/* CSS Styles for Card Section */}
-      {/* Include your existing CSS styles here if needed */}
-
     </div>
   );
 };
@@ -345,3 +399,5 @@ const getColorByLanguage = (language) => {
 };
 
 export default UserProfile;
+
+
