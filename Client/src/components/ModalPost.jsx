@@ -2,9 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {motion} from "framer-motion";
 import ImageCarousel3 from './ImageCarousel3.jsx';
 import {LikesModalComp} from "./index.js"
-import myImg from "../images/Screenshot 2024-03-29 112144.png";
-import myImg1 from "../images/free-photo-of-red-cherries-in-bowl-and-basket.jpeg";
-import myImg2 from "../images/tanjiro_hinokami_kagura.jpg";
 import { useUser } from '../ContextApi/UserContext.jsx';
 import axios from 'axios';
 import { message } from 'antd';
@@ -13,15 +10,16 @@ function ModalPost({onClose,data}) {
   const [num, setNum] = useState(data.likes.length);
   const [commentsData, setCommentsData] = useState([]);
   const [newCommentText, setNewCommentText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   console.log("This is from props -> ",data);
   const {userLikedPosts, setuserlikedPosts, userSavedPosts, setuserSavedPosts} = useUser();
   // console.log("liked: ",userLikedPosts)
 
   useEffect(() => {
+    setIsLoading(true);
     const apiCall = async() => {
       const response = await axios.post('/api/posts/getComment', {postId: data._id})
-      console.log("comments", response.data);
       if(response.data.success){
         setCommentsData(response.data.commentData);
       }
@@ -30,7 +28,12 @@ function ModalPost({onClose,data}) {
       }
     }
     apiCall();
+    likePostFunction(data._id);
   },[])
+
+  useEffect(() => {
+    setIsLoading(false);
+  },[commentsData])
   
   const likePostFunction = async(postId) => {
     const token = localStorage.getItem("token");
@@ -55,19 +58,16 @@ function ModalPost({onClose,data}) {
       message.error(response.data.message)
     }
   }
-  useEffect(() => {
-    const apiCall = async() => {
-      const response = await axios.post('/api/user/getuser', {username: localStorage.getItem('username')})
-      // console.log(response.data);
-      if(response.data.success){
-        // console.log("hi:", response.data.data.likedPosts)
-        setuserlikedPosts(response.data.data.likedPosts)
-        setuserSavedPosts(response.data.data.savedposts);
-      }
-    }
-    // apiCall();
-    likePostFunction(data._id);    
-  },[]);
+  // useEffect(() => {
+  //   const apiCall = async() => {
+  //     const response = await axios.post('/api/user/getuser', {username: localStorage.getItem('username')})
+  //     if(response.data.success){
+  //       setuserlikedPosts(response.data.data.likedPosts)
+  //       setuserSavedPosts(response.data.data.savedposts);
+  //     }
+  //   }
+  //   likePostFunction(data._id);    
+  // },[]);
 const overlayDivRef = useRef(null);
 
 const closeModal = (e) => {
@@ -97,7 +97,7 @@ const [isLikeModal, setIsLikeModal] = useState(false);
     <div 
     ref={overlayDivRef} 
     onClick={closeModal}
-    className='fixed z-50 inset-0 flex flex-col bg-opacity-10 bg-black dark:bg-white dark:bg-opacity-10 justify-center items-center'>
+    className='fixed z-50 inset-0 flex flex-col bg-opacity-10 bg-black dark:bg-opacity-10 justify-center items-center'>
       <div className='w-full flex justify-end px-8 -'>
         <i onClick={onClose} className='bx bx-x text-white text-5xl cursor-pointer'></i>
       </div>
@@ -116,20 +116,11 @@ const [isLikeModal, setIsLikeModal] = useState(false);
           <div className='flex gap-1 px-3 items-center h-[5%] py-2 '>
             <div className='rounded text-lg dark:text-white text-gray-800'>
               <img className='w-10 h-10 rounded-full' src={data.userid.imageurl} alt="" />
-              {/* <i className='bx bx-user'></i> */}
             </div>
             <div className='dark:text-white text-gray-800'>
               <p>@ {data.userid.username}</p>
             </div>
           </div>
-          {/* <div className='dark:text-white px-3 text-gray-800 h-[10%] mt-2'>
-            <p>{data.description}</p>
-          </div> */}
-          {/*Caption*/}
-
-          {/* <div className='px-3'>
-            <hr className='my-4' />
-          </div> */}
 
           <div className='flex flex-col px-3 gap-2 py-2 h-[75%] overflow-y-scroll dark:text-white text-gray-800'>
             <div className='dark:text-white px-3 text-gray-800 mt-2'>
@@ -138,19 +129,12 @@ const [isLikeModal, setIsLikeModal] = useState(false);
             <div className='flex flex-col'>
               {commentsData.length > 0 ?
                 commentsData.map((commentData, index) => (
-                  <div key={index} className='my-2 flex flex-col gap-2'>
+                  (<div key={index} className='my-2 flex flex-col gap-2'>
                     <CommentBubble commentData={commentData}/>
-                  </div>
-                )) : <div className='flex justify-center items-center h-full'><p>No comments to show</p></div>
+                  </div>)
+                )) : <div className='flex justify-center items-center '><p>No comments to show</p></div>
               }
             </div>
-            {/* {data.comments.length > 0 ?
-             data.comments.map(commentData => (
-              <div key={commentData} className='my-2'>
-                <CommentBubble/>
-              </div>
-            )) : <div className='flex justify-center items-center h-full'><p>No comments to show</p></div>
-            } */}
           </div>
 
           <div className=' w-full px-3 py-1 h-[20%] flex flex-col gap-2 dark:bg-[#242526] bg-white justify-end'>

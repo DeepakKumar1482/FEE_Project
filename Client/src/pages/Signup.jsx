@@ -5,7 +5,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { message } from "antd";
+import { Input, message } from "antd";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import Google from "../assets/Google.webp";
 import Loader from "../components/Loader/loader.jsx";
@@ -30,6 +30,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const { setUserData } = useUser();
   const[tempToken,setTempToken]=useState("");
+  const [showPassword, setShowPassword] = useState(false);
   // const 
   // Function to verify OTP
   const verifyOtp = async () => {
@@ -44,7 +45,7 @@ const Signup = () => {
         message.success("OTP verified. Signup successful!");
         setUserData({ email, password });
         // localStorage.setItem("token", tempToken);
-        setUserData((prev)=>{return {...prev,token:tempToken}});
+        // setUserData((prev)=>{return {...prev,token:tempToken}});
         console.log("This is res.data--------->");
         navigate("/profile");
       } else {
@@ -87,7 +88,7 @@ const Signup = () => {
     }
   
     // If all conditions are met
-    message.info("Password is strong now.");
+    // message.info("Password is strong now.");
     return true;
   }
 
@@ -144,7 +145,7 @@ const Signup = () => {
       });
       if (res.data.success) {
         message.success("Registered successfully. Sending OTP...");
-        setTempToken(res.data.token);
+        // setTempToken(res.data.token);
         setOtpSent(true);
       } else {
         if(res.data.check){
@@ -202,7 +203,7 @@ const Signup = () => {
         }
         if(res.data.isRegisteredCheck){
           setUserData({ email, password });
-          setUserData((prev)=>{return {...prev,token:res.data.token}});
+          // setUserData((prev)=>{return {...prev,token:res.data.token}});
           navigate("/profile");
         }else{
           message.error("Please Register first");
@@ -227,7 +228,7 @@ const Signup = () => {
 
   return (
     <div>
-      <ParticlesComponent />
+      {/* <ParticlesComponent /> */}
       {isTextLoader ? (
         <TextLoader />
       ) : (
@@ -237,7 +238,7 @@ const Signup = () => {
               CODEBUDDY
             </h1>
           </div>
-          <div id="loginbox" className="flex justify-center items-center w-full h-full mb-10">
+          <div id="" className="flex justify-center items-center w-full h-full mb-10">
             <div className="w-fit flex justify-center backdrop-blur-sm bg-black/30 h-full">
               <div className="w-96 h-auto pb-5 px-10 shadow-lg rounded-md border border-gray-300">
                 {param.signup === "signup" ? (
@@ -254,15 +255,27 @@ const Signup = () => {
                         />
                       </div>
 
-                      <div className="mb-4">
+                      <div className="mb-4 relative">
                         <input
                           onChange={(e) => setPassword(e.target.value)}
-                          type="password"
+                          type={showPassword ? "text" : "password"} // Toggle between text and password
                           name="password"
                           required
                           className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
                           placeholder="Password"
                         />
+                        <div className="flex items-center mt-2">
+                          <input
+                            type="checkbox"
+                            id="showPassword"
+                            checked={showPassword}
+                            onChange={() => setShowPassword(!showPassword)}
+                            className="mr-2 bg-transparent cursor-pointer"
+                          />
+                          <label htmlFor="showPassword" className="text-gray-400">
+                            Show Password
+                          </label>
+                        </div>
                       </div>
 
                       <button
@@ -272,6 +285,7 @@ const Signup = () => {
                       >
                         {loading ? "Signing Up..." : "Sign Up"}
                       </button>
+                      <p onClick={()=>navigate("/signin")} className="text-blue-400 hover:text-blue-500 cursor-pointer">have an account?</p>
                     </form>
 
                     <div className="w-60 h-5 border-b-2 rounded-md border-[#484848]"></div>
@@ -302,15 +316,27 @@ const Signup = () => {
                           placeholder="Username/Email"
                         />
                       </div>
-                      <div className="mb-4">
+                      <div className="mb-4 relative">
                         <input
                           onChange={(e) => setPassword(e.target.value)}
-                          type="password"
+                          type={showPassword ? "text" : "password"} // Toggle between text and password
                           name="password"
                           required
                           className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
                           placeholder="Password"
                         />
+                        <div className="flex items-center mt-2">
+                          <input
+                            type="checkbox"
+                            id="showPassword"
+                            checked={showPassword}
+                            onChange={() => setShowPassword(!showPassword)}
+                            className="mr-2 bg-transparent cursor-pointer"
+                          />
+                          <label htmlFor="showPassword" className="text-gray-400">
+                            Show Password
+                          </label>
+                        </div>
                       </div>
                       <button
                         type="submit"
@@ -319,7 +345,7 @@ const Signup = () => {
                       >
                         {loading ? "Signing In..." : "Sign In"}
                       </button>
-
+                      
                       <button
                         type="button"
                         onClick={() => setShowForgotPassword(true)}

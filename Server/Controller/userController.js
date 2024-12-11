@@ -39,7 +39,7 @@ const UserRegistrationController = async (req, res) => {
             text: `Your OTP is ${otp}. It's valid for 10 minutes.`,
         };
 
-        const token = jwt.sign({ id: req.body.email }, secretKey, { expiresIn: '6d' });
+        // const token = jwt.sign({ id: req.body.email }, secretKey, { expiresIn: '6d' });
 
         if (isEmailExist) {
             const isExistInUserModel=await UserModel.findOne({email:req.body.email});
@@ -65,7 +65,7 @@ const UserRegistrationController = async (req, res) => {
                 return res.status(200).json({
                     success: true,
                     message: 'Please check your email for the OTP.And Verify your email',
-                    token
+                    // token
                 });
             }else{
             return res.status(200).json({
@@ -94,7 +94,7 @@ const UserRegistrationController = async (req, res) => {
         res.status(201).json({
             success: true,
             message: 'User registered successfully. Please check your email for the OTP.',
-            token
+            // token
         });
     } catch (error) {
         console.log(error);
@@ -154,14 +154,15 @@ const LogincheckController = async(req, res) => {
             user = await ProfileModel.findOne({ username:req.body.username });
         }
         console.log("This is user ->",user);
-        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' });
+        
         var isRegistered;
         if(!user){
             isRegistered=await UserModel.findOne({email:req.body.username});
+            // const token = jwt.sign({ id: isRegistered.email }, secretKey, { expiresIn: '6d' });
             if(isRegistered){
                 return res.status(200).send({
                     success: false,
-                    token,
+                    // token,
                     // message: "Please make your profile first",
                     isRegisteredCheck:true
                 })
@@ -173,6 +174,7 @@ const LogincheckController = async(req, res) => {
                 })
             }
         }
+        const token = jwt.sign({ id: user.username }, secretKey, { expiresIn: '6d' });
         // console.log("This is user ->",user);
         if (!user) {
             return res.status(200).send({
@@ -590,6 +592,7 @@ const MessageController = (req, res) => {
 const uploadcontroller = async(req, res) => {
     try {
         const { githubid, name, username, password, university, techStack,email } = req.body;
+        console.log("This is req.body -> ",req.body);
         const user=await ProfileModel.findOne({username:username});
         if(user){
             return res.status(200).send({
@@ -641,12 +644,12 @@ const uploadcontroller = async(req, res) => {
 
         // Generate a token if needed (optional)
         // const token = newUser.generateAuthToken();
-        // const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' })
+        const token = jwt.sign({ id: username }, secretKey, { expiresIn: '6d' })
 
         res.status(201).json({
             success: true,
             message: 'Image uploaded successfully',
-            // token,
+            token,
         });
 
         // The image has been uploaded to Cloudinary, and the URL is available in req.file.path
@@ -837,6 +840,43 @@ const AcceptConnectionController=async(req,res)=>{
     }
 }
 
+const getConnections = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const userConnections = await ProfileModel.findById(userId);
+        if(userConnections.connections.length == 0){
+            return res.status(404).json({
+                success: false,
+                message: "No connections were found"
+            })
+        }
+        // const connData = await ProfileModel.findById(userConnections.connections[0]).select("username name imageurl");
+        // console.log("first", connData);
+        const finalConnections = [];
+        for(let i = 0; i < userConnections.connections.length; i++){
+            const connData = await ProfileModel.findById(userConnections.connections[i]).select("username name imageurl");
+            finalConnections.push(connData);
+        }
+        // const data = await userConnections.connections.map(async(connectionid, index) => {
+        //     const connData = await ProfileModel.findById(connectionid).select("username name imageurl");
+        //     console.log(connData, "inside");
+        //     finalConnections[index] = connData;
+        // })
+        console.log(finalConnections, "final");
+        return res.status(200).json({
+            success: true,
+            message: "Fetched connections succcessfully",
+            connections: finalConnections
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Error while fetching connections"
+        })
+    }
+}
+
 const RejectConnectionController = async(req, res) => {
     try{
         const {sender,reciever,notificationid}=req.body;
@@ -898,7 +938,10 @@ const GetAllUserController = async(req, res) => {
         res.status(500).send('Internal Server Error');
     }
 }
+
+
 module.exports = {
+    getConnections,
     UserRegistrationController,
     VerifyOtpController,
     IsUserExist,

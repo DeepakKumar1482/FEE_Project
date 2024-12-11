@@ -1,5 +1,6 @@
 const Conversation = require("../models/conversations.model.js");
 const Message = require("../models/message.model.js");
+const ProfileModel = require("../schema/userProfileSchema.js");
 const { io, userSocketid } = require("../server.js");
 
 const sendMessage = async (req, res) => {
@@ -91,19 +92,9 @@ const getMessage = async (req, res) => {
         const conversation = await Conversation.findOne({
             participants: { $all: [sender, receiver] },
         }).populate([
-            // {
-            //     path: "participants",
-            //     select: "username name"
-            // },
             {
                 path: "messages",
                 select: " -__v",
-                // options: {
-                //     sort: {updatedAt : -1},
-                //     limit : Number(10),
-                //     skip : (Number(cursor) - 1) * Number(limit)
-                // },
-                // limit: 10,
                 populate: {
                     path: "sender receiver",
                     select: "username name imageurl",
@@ -111,7 +102,7 @@ const getMessage = async (req, res) => {
             },
         ]);
         // console.log(conversation);
-        if (conversation) {
+        if (conversation && conversation.messages.length > 0) {
             return res
                 .json({
                     success: true,
@@ -120,7 +111,7 @@ const getMessage = async (req, res) => {
                 })
                 .status(200);
         }
-        return Response.json({
+        return res.status(200).json({
             success: false,
             message: `No conversation exists`,
             chats: [],
@@ -173,8 +164,38 @@ const getConversation = async (req, res) => {
         });
     }
 };
+
+const getConversationFromConnection = async(req, res) => {
+    try {
+
+        const {connectionId} = req.body;
+        const connectionUser = await ProfileModel.findById(connectionId).select(" username name imageurl");
+        console.log("connectionUser", connectionUser);
+        if(!connectionUser){
+            res.status(404).json({
+                success: false,
+                message: "Connection not found"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Connections found successfully",
+            conversation: connectionUser
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Error fetching conversations",
+        })
+    }
+}
+
 module.exports = {
     sendMessage,
     getMessage,
     getConversation,
+    getConversationFromConnection
 };
