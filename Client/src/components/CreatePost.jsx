@@ -4,13 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { Form, Input, message, Select } from "antd";
 import axios from "axios";
 import Loader from "./Loader/loader";
-
+import Tech from "../Data/TechData";
 const { Option } = Select;
 
 const CreatePost = () => {
   const [selectedImages, setSelectedImages] = useState([]);
-  const [imageUrls, setImageUrls] = useState([]);
   const [description, setDescription] = useState("");
+  const [imageUrls, setImageUrls] = useState([]);
   const [loader, setLoader] = useState(false);
   const [repos, setRepo] = useState({});
   const [temp, setTemp] = useState(0);
@@ -35,8 +35,26 @@ const CreatePost = () => {
   }, []);
 
   const handleFileChange = (event) => {
-    const files = event.target.files;
-    setSelectedImages([...selectedImages, ...files]);
+    const files = Array.from(event.target.files);
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+    const validImages = files.filter((file) =>
+      allowedTypes.includes(file.type)
+    );
+
+    const invalidImages = files.filter((file) => !allowedTypes.includes(file.type));
+    if (invalidImages.length > 0) {
+      invalidImages.forEach((file) =>
+        message.error(`Invalid file type: ${file.name}`)
+      );
+    }
+
+    setSelectedImages((prev) => [...prev, ...validImages]);
+    event.target.value = ""; // Clear input value to allow re-selection
+  };
+
+  const removeImage = (index) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const cloudinaryUpload = async (file) => {
@@ -102,37 +120,6 @@ const CreatePost = () => {
     setTemp((val) => val + 1);
   }, [imageUrls]);
 
-  const Tech = [
-    "React.js",
-    "Node.js",
-    "TypeScript",
-    "Docker",
-    "Kubernetes",
-    "GraphQL",
-    "Next.js",
-    "Tailwind CSS",
-    "Vue.js",
-    "Svelte",
-    "Python",
-    "Django",
-    "Flask",
-    "FastAPI",
-    "JavaScript (ES6+)",
-    "HTML5",
-    "CSS3",
-    "Bootstrap",
-    "MongoDB",
-    "PostgreSQL",
-    "Redis",
-    "Elasticsearch",
-    "AWS",
-    "Google Cloud Platform",
-    "Microsoft Azure",
-    "Machine Learning",
-    "AI",
-    "DevOps",
-  ];
-  Tech.sort();
 
   return (
     <div className="flex justify-center items-center min-h-screen px-4 py-8 w-[40%] dark:text-white">
@@ -140,19 +127,23 @@ const CreatePost = () => {
         {/* Image Upload Section */}
         <div className="mb-6">
           <div className="border border-dashed border-gray-300 dark:border-[#161616] rounded-lg p-4">
-            <label
-              htmlFor="file-input"
-              className="flex flex-col items-center justify-center cursor-pointer"
-            >
+            <div className="flex flex-col items-center">
               {selectedImages.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
                   {selectedImages.map((image, index) => (
-                    <img
-                      key={index}
-                      className="w-32 h-32 object-cover rounded-md"
-                      src={URL.createObjectURL(image)}
-                      alt="Selected"
-                    />
+                    <div key={index} className="relative">
+                      <img
+                        className="w-32 h-32 object-cover rounded-md"
+                        src={URL.createObjectURL(image)}
+                        alt="Selected"
+                      />
+                      <button
+                        className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-700 transition duration-200"
+                        onClick={() => removeImage(index)}
+                      >
+                        &times;
+                      </button>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -163,12 +154,21 @@ const CreatePost = () => {
                   </span>
                 </div>
               )}
-            </label>
+            </div>
+
+            {/* File Input Button */}
+            <button
+              className="w-full bg-blue-600 text-white py-2 rounded-md mt-4 hover:bg-blue-700 transition duration-300"
+              onClick={() => document.getElementById("file-input").click()}
+            >
+              Upload Image
+            </button>
             <input
               id="file-input"
               type="file"
               className="hidden"
               multiple
+              accept="image/*"
               onChange={handleFileChange}
             />
           </div>

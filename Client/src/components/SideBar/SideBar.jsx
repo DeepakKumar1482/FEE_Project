@@ -142,6 +142,7 @@ function SideBar() {
       <div className="flex items-center py-5 ">
         <Link 
           to="/"
+          onClick={() => window.location.reload()}
           className='flex text-[#695CFE] cursor-pointer flex-row items-center h-12 dark:hover:text-gray-300 hover:text-gray-800 mb-2'>
         <div className='flex justify-start items-center'>
           <span className="inline-flex items-center justify-center h-12 w-12 text-5xl ml-2"><i className={`bx bx-user`}></i></span>
@@ -159,13 +160,16 @@ function SideBar() {
             <li key={item.name}>
               <Link 
               to={item.slug}
+              onClick={() => {
+                item.name == "Home" && location.pathname == "/" && window.location.reload()
+              }}
               className='flex cursor-pointer flex-row items-center h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] transition-bg-color justify-between'
               >
                 <div className='flex justify-start items-center w-fit'>
-                  <span className="inline-flex relative items-center justify-center h-12 w-12 mr-1 text-2xl"><i className={`bx bx-${item.icon}`}>{((item.name == "Notifications" || item.name == "Messages") && !open) ? <div className='w-2 h-2 bg-red-500 rounded absolute top-2'></div> : null}</i></span>
+                  <span className="inline-flex relative items-center justify-center h-12 w-12 mr-1 text-2xl"><i className={`bx bx-${item.icon}`}>{((item.name == "Notificat" || item.name == "Messa") && !open) ? <div className='w-2 h-2 bg-red-500 rounded absolute top-2'></div> : null}</i></span>
                   <span className={`text-base font-[550] overflow-hidden ${open ? "block scale-100" : "hidden scale-0"} duration-300`}>{item.name}</span>
                 </div>
-                <span className={`${((item.name == "Notifications" || item.name == "Messages") && open) ? "" : "scale-0"} mr-6 text-sm bg-red-100 rounded-full ml-2 px-3 py-px text-red-500`}>5</span>
+                <span className={`${((item.name == "Notificati" || item.name == "Messa") && open) ? "" : "scale-0"} mr-6 text-sm bg-red-100 rounded-full ml-2 px-3 py-px text-red-500`}>5</span>
                 {/* {((item.name == "Notifications" || item.name == "Messages") && open) ? <span className="mr-6 text-sm bg-red-100 rounded-full float-right px-3 py-px text-red-500">5</span> : null} */}
               </Link>
             </li>

@@ -147,7 +147,7 @@ function PostCard() {
     return (
     <>
       {data?.pages.map((page, index) =>
-      page.posts.map((postdata, key) => (
+      page?.posts?.map((postdata, key) => (
         <div
           key={key}
           className="flex flex-col gap-2 w-[30rem] px-5 py-8 rounded-xl justify-evenly h-screen"
@@ -158,17 +158,17 @@ function PostCard() {
               <i className="h-5 w-5">
                 <img
                   className="h-10 w-10 rounded-full"
-                  src={postdata.userid.imageurl}
+                  src={postdata?.userid?.imageurl}
                   alt=""
                 />
               </i>
             </div>
             <div className="flex flex-col">
               <p className="dark:text-white text-gray-800 font-semibold font-sans">
-                {postdata.userid.name}
+                {postdata?.userid?.name}
               </p>
               <p className="dark:text-white text-gray-800 font-semibold font-sans -mt-1">
-                @ {postdata.userid.username}
+                @ {postdata?.userid?.username}
               </p>
             </div>
           </div>{" "}

@@ -706,6 +706,23 @@ const AddConnectionController = async(req, res) => {
             }
 
         }
+
+
+
+        const SenderNotifications=await Notifications.findOne({User:user._id});
+        if(SenderNotifications && SenderNotifications.notifications.length>0){
+            for(var i=0;i<SenderNotifications.notifications.length;i++){
+                // console.log("This is receiverNotifications.notifications[i].userid -> ",receiverNotifications.notifications[i].userid);
+                // console.log("This is user._id -> ",user._id);
+                if(SenderNotifications.notifications[i].userid.toString()===connectionData._id.toString()){
+                    return res.status(200).send({
+                        success:false,
+                        message:`${connectionData.username} have already sent a you a request`
+                    });
+                }
+            }
+
+        }
         // console.log("This is the connection id who is going to be added -> ",connectionData._id);
         if(connectionData.connections.includes(sender._id) || user.connections.includes(connectionData._id)){
             return res.status(200).send({
@@ -748,11 +765,12 @@ const AddConnectionController = async(req, res) => {
     }
 }
 
+
 const GetNotificationsController = async(req, res) => {
     try{
         console.log(req.query.username);
         const user=await ProfileModel.findOne({username:req.query.username});
-
+        
         const notifications=await Notifications.findOne({User:user._id}).populate({
             path: 'notifications',
             populate: {
@@ -856,6 +874,68 @@ const getConnections = async (req, res) => {
     }
 }
 
+const RejectConnectionController = async(req, res) => {
+    try{
+        const {sender,reciever,notificationid}=req.body;
+        // const Notification=await Notifications.findOne({notifications._id:notificationid});
+        
+        const user=await ProfileModel.findOne({username:sender});
+        // user.connections.push(reciever);
+        // console.log("This is Notification id",notificationid)
+        // await user.save();
+        // console.log("This is sender id",user._id);
+        // console.log("This is reciever id",reciever)
+        // const connectionUser=await ProfileModel.findOne({_id:reciever});
+        // console.log("This is connectionUser -> ",connectionUser)
+        // connectionUser.connections.push(user._id);
+        // await connectionUser.save();
+
+        
+        
+        const result = await Notifications.findOneAndUpdate(
+            { User: user._id }, // Find the document by user _id
+            { $pull: { notifications: { _id: notificationid } } } ,// Remove the specific object in the array
+            { new: true } 
+          );
+          res.status(200).send({
+            success:true,
+            message:"Connection request rejected"
+        })
+    }catch(err){
+        res.status(500).send({
+            success: false,
+            message: "Internal server error"
+        });
+        console.log(err);
+    }
+}
+
+const GetAllUserController = async(req, res) => {
+    const { studyingAt, githubid, username, email, techStack } = req.query;
+    const filter = {};
+
+    if (studyingAt) filter.studyingAt = { $regex: studyingAt, $options: 'i' };
+    if (githubid) filter.githubid = { $regex: githubid, $options: 'i' };
+    if (username) filter.username = { $regex: username, $options: 'i' };
+    if (email) filter.email = { $regex: email, $options: 'i' };
+
+    // Handle techStack filtering
+    if (techStack) {
+        const techArray = techStack.split(',').map((tech) => tech.trim());
+        filter.techStack = { $all: techArray.map((tech) => new RegExp(tech, 'i')) };
+    }
+
+    try {
+        // Include `username` and `imageurl` in the response
+        const users = await ProfileModel.find(filter, 'username imageurl'); 
+        res.json(users);
+        // console.log(users)
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
 module.exports = {
     getConnections,
     UserRegistrationController,
@@ -873,5 +953,7 @@ module.exports = {
     UpdateAboutController,
     AddConnectionController,
     GetNotificationsController,
-    AcceptConnectionController
+    AcceptConnectionController,
+    RejectConnectionController,
+    GetAllUserController
 };

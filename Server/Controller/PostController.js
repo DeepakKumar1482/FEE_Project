@@ -1,4 +1,5 @@
 const Comment = require("../models/comments.model.js");
+const { options } = require("../Routes/message.routes.js");
 const postModel = require("../schema/postSchema.js");
 const ProfileModel = require("../schema/userProfileSchema.js");
 
@@ -257,5 +258,33 @@ const getComment = async (req, res) => {
         )
     }
 }
-
-module.exports = {getPostsController, likePost, bookmark, getSavedPosts, addComment, getComment};
+const getUserProfilepostsController = async(req, res) => {
+    try{
+        const username=req.query.username;
+        const UserDetails=await ProfileModel.findOne({username:username});
+        const userId = UserDetails._id;
+        const userPosts = await ProfileModel.findById(userId).populate({
+            path: "posts",
+            options: {sort: {createdAt : -1}},
+            populate: {
+                path: "userid",
+                select: "username name imageurl",
+            }
+        });
+        if(!userPosts){
+            return res.status(404).json({
+                success: false,
+                message: "No saved posts"
+            })
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Saved post fetched successfully",
+            UserPosts: userPosts.posts
+        })
+    }catch(error){
+        console.log(error);
+        res.status(500).json({ error: error.message });
+    }
+}
+module.exports = {getPostsController, likePost, bookmark, getSavedPosts, addComment, getComment,getUserProfilepostsController};
