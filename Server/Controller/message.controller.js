@@ -158,6 +158,7 @@ const getConversation = async (req, res) => {
             conversations: response,
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
             message: "Error fetching conversations",

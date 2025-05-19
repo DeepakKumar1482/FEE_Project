@@ -65,7 +65,10 @@ const authmiddleware = async(req, res, next) => {
     } catch (err) {
         const error = new Error(err?.message || "Middleware Error");
         error.statusCode = 500;
-        throw error;
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
     }
 }
 module.exports = authmiddleware;

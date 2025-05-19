@@ -150,6 +150,7 @@ const getSavedPosts = async(req, res) => {
         })
         
     } catch (error) {
+        console.log(error, "saved posts error");
         return res.status(500).json(
             {
                 success: false,
@@ -262,6 +263,7 @@ const getUserProfilepostsController = async(req, res) => {
     try{
         const username=req.query.username;
         const UserDetails=await ProfileModel.findOne({username:username});
+        console.log(UserDetails);
         const userId = UserDetails._id;
         const userPosts = await ProfileModel.findById(userId).populate({
             path: "posts",
@@ -287,4 +289,32 @@ const getUserProfilepostsController = async(req, res) => {
         res.status(500).json({ error: error.message });
     }
 }
-module.exports = {getPostsController, likePost, bookmark, getSavedPosts, addComment, getComment,getUserProfilepostsController};
+
+const deletePostUser = async(req, res) => {
+    try {
+        const { postId } = req.body;
+        if(!postId){
+            res.status(404).json({
+                success: false,
+                message: "Post Id is required"
+            })
+        }
+        const deletedPost = await postModel.findByIdAndDelete(postId);
+        if(!deletedPost){
+            res.status(404).json({
+                success: false,
+                message: "Error deleting post"
+            })
+        }
+        res.status(200).json({
+            success: true,
+            message: "Post deleted successfully"
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Post deletion failed"
+        })
+    }
+}
+module.exports = {getPostsController, likePost, bookmark, getSavedPosts, addComment, getComment,getUserProfilepostsController, deletePostUser};

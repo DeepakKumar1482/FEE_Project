@@ -70,12 +70,16 @@ const CreatePost = () => {
       );
       return response.data.secure_url;
     } catch (error) {
-      console.error(error);
+      console.error(error, "hashdgohosd");
       setLoader(false);
       message.error("Image size is too large");
       return null;
     }
   };
+
+  useEffect(() => {
+    console.log("selectedImage:" , selectedImages);
+  },[selectedImages])
 
   const handleSubmit = async (values) => {
     try {
@@ -93,6 +97,7 @@ const CreatePost = () => {
 
   const savePost = async () => {
     try {
+      console.log(imageUrls, "imageurls in the saved post function");
       const res = await axios.post(
         "http://localhost:8080/api/user/createpost",
         { imageUrls, description, ...repos, currDate, currTime },

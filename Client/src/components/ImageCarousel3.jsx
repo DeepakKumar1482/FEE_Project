@@ -28,7 +28,7 @@ function ImageCarousel3({data, height}) {
   return (
     <div className='w-full relative'>
         <Carousel arrows prevArrow={<PrevArrow/>} nextArrow={<NextArrow/>} className={`${height}`}>
-            {data.map((postImage, index) => (
+            {data?.map((postImage, index) => (
                 <div className="flex justify-center items-center" key={index}>
                     <div className={`w-full ${height}`}>
                         <img className="h-full w-full object-contain" src={postImage} alt="" />

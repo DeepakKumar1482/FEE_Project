@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
-    imageUrls: {
-        type: [String],
-    },
+    imageUrls: [{
+        type: String,
+    }],
     description: {
         type: String,
         required: true,

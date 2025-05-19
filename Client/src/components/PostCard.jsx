@@ -176,7 +176,7 @@ function PostCard() {
           <div className={`flex h-[320px] rounded-xl justify-center bg-black`}>
             {postdata.imageUrls.length > 1 ? (
               <ImageCarousel3
-                data={postdata.imageurls}
+                data={postdata.imageUrls}
                 height={"h-[320px]"}
               />
             ) : (
@@ -205,6 +205,7 @@ function PostCard() {
                 onClick={() => {
                   document.body.style.overflowY = "hidden";
                   setIsModalPostOpen(true);
+                  console.log("propdata", postdata)
                   setpropdata(postdata);
                 }}
                 className="cursor-pointer text-blue-400 hover:text-blue-500 active:text-indigo-600"

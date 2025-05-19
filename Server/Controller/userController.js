@@ -145,16 +145,16 @@ const LogincheckController = async(req, res) => {
                 break;
             }
         }
-        var user;
+        let user;
         if(isEmail){
             console.log("inside Isemail");
-            user=await ProfileModel.findOne({email:req.body.username});
+            user=await ProfileModel.findOne({email:username});
             flag=true;
         }else{
-            user = await ProfileModel.findOne({ username:req.body.username });
+            user = await ProfileModel.findOne({ username:username });
         }
         console.log("This is user ->",user);
-        const token = jwt.sign({ id: user.username }, secretKey, { expiresIn: '6d' });
+        const token = jwt.sign({ id: user?.username }, secretKey, { expiresIn: '6d' });
         var isRegistered;
         if(!user){
             isRegistered=await UserModel.findOne({email:req.body.username});
@@ -325,7 +325,7 @@ const CreatePostController = async(req, res) => {
         const username = req.userName;
         const user=await ProfileModel.findOne({username:username});
         const userid=user._id;
-        const imageUrls = req.body.imageUrls[0];
+        const imageUrls = req.body.imageUrls;
         console.log("this is imageurls",imageUrls);
         const { description, githubRepo, tech, currDate, currTime } = req.body;
         const newpost=new postModel({
@@ -340,13 +340,8 @@ const CreatePostController = async(req, res) => {
             userid
         })
         await newpost.save();
-        console.log("This is new post -> ",newpost._id);
-        console.log(username);
-        // const user=await ProfileModel.findOne({username:username});
-        // console.log(user.ObjectId);
         user.posts.push(newpost);
         await user.save();
-        console.log(user.posts);
         res.status(200).send({
             success: true,
             message: 'Saved'
