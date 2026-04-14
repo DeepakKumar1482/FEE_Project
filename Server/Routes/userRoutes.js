@@ -1,10 +1,25 @@
 const express = require('express');
-const { newUserController, IsUserExist, CreatePostController, LogincheckController, MessageController } = require('../Controller/userController.js');
+const { IsUserExist, CreatePostController, LogincheckController, MessageController, uploadcontroller, UserRegistrationController, VerifyOtpController, SendOtpController, VerifyForgotOtpController, ResetPasswordController, GetUserController, UpdateAboutController, AddConnectionController, GetNotificationsController, AcceptConnectionController, getConnections, RejectConnectionController, GetAllUserController } = require('../Controller/userController.js');
 const authmiddleware = require('../middleware/authmiddleware.js');
+const upload = require('../middleware/multermiddleware.js');
 const router = express.Router();
-router.post('/createuser', newUserController);
+// router.post('/createuser', newUserController);
+router.post('/register', UserRegistrationController);
+router.post('/verifyotp', VerifyOtpController);
+router.post('/OtpSend',SendOtpController);
+router.post('/getuser', GetUserController);
+router.post('/verify-forgot-otp',VerifyForgotOtpController);
+router.post('/updateabout',UpdateAboutController);
+router.post('/reset-password',ResetPasswordController);
 router.post('/isUserExist', IsUserExist);
 router.post('/createpost', authmiddleware, CreatePostController);
 router.post('/logincheck', LogincheckController);
-router.post('/message', authmiddleware, MessageController);
+router.post('/addconnection',AddConnectionController);
+router.get('/getNotifications',GetNotificationsController);
+router.post('/AcceptConnection',AcceptConnectionController);
+router.get('/getConnections', authmiddleware, getConnections);
+router.post('/RejectConnection',RejectConnectionController);
+router.get('/getallusers',GetAllUserController);
+// router.post('/message', authmiddleware, MessageController);
+router.post('/upload', upload.single('image'), uploadcontroller);
 module.exports = router

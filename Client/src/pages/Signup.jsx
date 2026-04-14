@@ -2,78 +2,176 @@ import { useEffect, useState } from "react";
 import { app } from "../Firebase/config.js";
 import {
   getAuth,
-  createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { Form, Input, message } from "antd";
-import { useNavigate, Link } from "react-router-dom";
+import { Input, message } from "antd";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import Google from "../assets/Google.webp";
-import { useParams } from "react-router-dom";
 import Loader from "../components/Loader/loader.jsx";
 import axios from "axios";
 import { ParticlesComponent } from "../components";
 import { TextLoader } from "./";
-
+import OTPPopup from "../components/OtpPopup";
+// import ForgotPasswordModal from "./ForgotPasswordModal";
+import  ForgotPasswordModal  from "../components/ForgotPasswordPopup.jsx";
+import { useUser } from "../ContextApi/UserContext.jsx";
 const Signup = () => {
   const param = useParams();
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isTextLoader, setIsTextLoader] = useState(true);
-  const googleauthProvider = new GoogleAuthProvider();
-  const db = getAuth(app);
+  const [otpSent, setOtpSent] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [otpValue, setOtpValue] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const googleAuthProvider = new GoogleAuthProvider();
+  const auth = getAuth(app);
   const navigate = useNavigate();
-
-  // Improved Signup with Email function with better error handling
-  const SignupwithMail = async (values) => {
-    setloading(true);
+  const { setUserData } = useUser();
+  const[tempToken,setTempToken]=useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  // const 
+  // Function to verify OTP
+  const verifyOtp = async () => {
+    setLoading(true);
     try {
-      await createUserWithEmailAndPassword(db, values.email, values.password);
-      message.success("Successfully Signed up");
-      setloading(false);
-      navigate("/profile");
-    } catch (error) {
-      setloading(false);
-      if (error.code === "auth/email-already-in-use") {
-        message.error("Email already exists");
-      } else if (error.code === "auth/invalid-email") {
-        message.error("Invalid email address");
-      } else if (error.code === "auth/weak-password") {
-        message.error("Weak password. Please choose a stronger password");
+      const res = await axios.post("/api/user/verifyotp", {
+        email,
+        password,
+        otpValue,
+      });
+      if (res.data.success) {
+        message.success("OTP verified. Signup successful!");
+        setUserData({ email, password });
+        // localStorage.setItem("token", tempToken);
+        setUserData((prev)=>{return {...prev,token:tempToken}});
+        console.log("This is res.data--------->");
+        navigate("/profile");
       } else {
-        message.error("An error occurred. Please try again.");
+        message.error(res.data.message);
       }
+    } catch (err) {
+      console.log(err);
+      message.error("OTP verification failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  function validatePassword(password) {
+    const minLength = 8; // Minimum length of 8 characters
+    const hasUpperCase = /[A-Z]/.test(password); // At least one uppercase letter
+    const hasLowerCase = /[a-z]/.test(password); // At least one lowercase letter
+    const hasDigits = /\d/.test(password); // At least one digit
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password); // At least one special character
+  
+    // Check each condition
+    if (password.length < minLength) {
+      message.error("Password must be at least 8 characters long!");
+      return false;
+    }
+    if (!hasUpperCase) {
+       message.error("Password must contain at least one uppercase letter!");
+      return false;
+    }
+    if (!hasLowerCase) {
+      message.error("Password must contain at least one lowercase letter!");
+      return false;
+    }
+    if (!hasDigits) {
+      message.error("Password must contain at least one digit!");
+      return false;
+    }
+    if (!hasSpecialChar) {
+      message.error("Password must contain at least one special character!");
+      return false;
+    }
+  
+    // If all conditions are met
+    message.info("Password is strong now.");
+    return true;
+  }
+
+
+
+  function validateGmail(email) {
+    // Regular expression to validate Gmail address
+    const regex = /^[a-zA-Z0-9](\.?[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-])*@[gG][mM][aA][iI][lL]\.com$/;
+  
+    if (!email || email.length > 320) {
+      message.info("Error: Email length exceeds 320 characters or is empty.");
+      return false;
+    }
+  
+    if (!regex.test(email)) {
+      message.info("Error: Invalid Gmail address format.");
+      return false;
+    }
+  
+    const [localPart, domainPart] = email.split("@");
+    
+    if (localPart.length > 64) {
+      message.info("Error: Local part exceeds 64 characters.");
+      return false;
+    }
+  
+    if (domainPart.length > 255) {
+      message.info("Error: Domain part exceeds 255 characters.");
+      return false;
+    }
+  
+    if (localPart.startsWith(".") || localPart.endsWith(".") || localPart.includes("..")) {
+       message.info("Error: Local part contains invalid dot placement.");
+       return false;
+    }
+  
+    return true;
+  }
+  const SignupWithMail = async (event) => {
+    event.preventDefault();
+    const isValidEmail=validateGmail(email);
+    if(!isValidEmail){
+      return;
+    }
+    const isValidPassowrd=validatePassword(password);
+    if(!isValidPassowrd){
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await axios.post("/api/user/register", {
+        email: email,
+        password: password,
+      });
+      if (res.data.success) {
+        message.success("Registered successfully. Sending OTP...");
+        setTempToken(res.data.token);
+        setOtpSent(true);
+      } else {
+        if(res.data.check){
+          message.error("Already have an account");
+          navigate("/signin");
+        }else{
+        navigate("/signin");
+        message.error(res.data.message);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      message.error("Registration failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const signupWithGoogle = () => {
-    signInWithPopup(db, googleauthProvider)
+    signInWithPopup(auth, googleAuthProvider)
       .then((result) => {
         const user = result.user;
-        const creationTime = user.metadata.creationTime;
-        const creationObject = new Date(creationTime);
-        const hours = creationObject.getHours().toString().padStart(2, "0");
-        const minutes = creationObject.getMinutes().toString().padStart(2, "0");
-        const seconds = creationObject.getSeconds().toString().padStart(2, "0");
+        const creationTime = new Date(user.metadata.creationTime).getTime();
+        const lastLoginTime = new Date(user.metadata.lastSignInTime).getTime();
 
-        const creationtimeString = `${hours}${minutes}${seconds}`;
-
-        const lastloginTime = user.metadata.lastSignInTime;
-        const lastloginObject = new Date(lastloginTime);
-        const lastloginhours = lastloginObject
-          .getHours()
-          .toString()
-          .padStart(2, "0");
-        const lastloginminutes = lastloginObject
-          .getMinutes()
-          .toString()
-          .padStart(2, "0");
-        const lastloginseconds = creationObject
-          .getSeconds()
-          .toString()
-          .padStart(2, "0");
-        const lastlogintimeString = `${lastloginhours}${lastloginminutes}${lastloginseconds}`;
-
-        if (creationtimeString === lastlogintimeString) {
+        if (creationTime === lastLoginTime) {
           message.success("Signed up successfully");
           navigate("/profile");
         } else {
@@ -82,44 +180,55 @@ const Signup = () => {
         }
       })
       .catch((error) => {
-        console.error("Error during Google sign-in:", error);
-        message.error(
-          "An error occurred during Google sign-in. Please try again."
-        );
+        message.error("An error occurred during Google sign-in. Please try again.");
       });
   };
 
   const signin = async (values) => {
     try {
-      setloading(true);
+      setLoading(true);
       const res = await axios.post(
-        "http://localhost:8080/api/user/logincheck",
+        "/api/user/logincheck",
         { ...values }
       );
       if (res.data.success) {
         message.success(res.data.message);
         localStorage.setItem("token", res.data.token);
+        console.log("This is res.data--------->",res.data.user.email);
+        localStorage.setItem("username", res.data.user.username);
         navigate("/");
       } else {
-        message.error(res.data.message);
+        if(res.data.isPasswordMatch){
+          return message.error(res.data.message);
+        }
+        if(res.data.isRegisteredCheck){
+          setUserData({ email, password });
+          setUserData((prev)=>{return {...prev,token:res.data.token}});
+          navigate("/profile");
+        }else{
+          message.error("Please Register first");
+          navigate("/signup");
+        }
+        // message.error(res.data.message);
       }
-      setloading(false);
     } catch (e) {
-      setloading(false);
       message.error(e.message);
       console.log(e);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsTextLoader(false);
     }, 6000);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <div>
-      <ParticlesComponent />
+      {/* <ParticlesComponent /> */}
       {isTextLoader ? (
         <TextLoader />
       ) : (
@@ -129,117 +238,147 @@ const Signup = () => {
               CODEBUDDY
             </h1>
           </div>
-          <div
-            id="loginbox"
-            className="flex justify-center items-center w-full h-full mb-10"
-          >
+          <div id="" className="flex justify-center items-center w-full h-full mb-10">
             <div className="w-fit flex justify-center backdrop-blur-sm bg-black/30 h-full">
               <div className="w-96 h-auto pb-5 px-10 shadow-lg rounded-md border border-gray-300">
                 {param.signup === "signup" ? (
                   <div className="flex flex-col justify-center items-center gap-6 h-full">
-                    <Form onFinish={SignupwithMail} className="pt-10 w-72">
-                      <Form.Item
-                        name="email"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please input your Email!",
-                          },
-                          {
-                            type: "email",
-                            message: "The input is not valid E-mail!",
-                          },
-                        ]}
-                      >
-                        <Input
-                          className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
+                    <form onSubmit={SignupWithMail} className="pt-10 w-72">
+                      <div className="mb-4">
+                        <input
+                          onChange={(e) => setEmail(e.target.value)}
+                          type="email"
+                          name="email"
+                          required
+                          className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
                           placeholder="Email"
                         />
-                      </Form.Item>
-                      <Form.Item
-                        name="password"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please input your Password!",
-                          },
-                        ]}
-                      >
-                        <Input
-                          type="password"
-                          className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
+                      </div>
+
+                      <div className="mb-4 relative">
+                        <input
+                          onChange={(e) => setPassword(e.target.value)}
+                          type={showPassword ? "text" : "password"} // Toggle between text and password
+                          name="password"
+                          required
+                          className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
                           placeholder="Password"
                         />
-                      </Form.Item>
+                        <div className="flex items-center mt-2">
+                          <input
+                            type="checkbox"
+                            id="showPassword"
+                            checked={showPassword}
+                            onChange={() => setShowPassword(!showPassword)}
+                            className="mr-2 bg-transparent cursor-pointer"
+                          />
+                          <label htmlFor="showPassword" className="text-gray-400">
+                            Show Password
+                          </label>
+                        </div>
+                      </div>
+
                       <button
                         type="submit"
-                        className="w-full h-11 flex items-center justify-center bg-[#695CFE] hover:bg-[#574cd0] active:bg-[#574cd0] active:scale-95 duration-150 text-white text-base font-semibold py-2 gap-2 px-4 mb-4 rounded-lg"
+                        className="w-full h-11 flex items-center justify-center bg-[#695CFE] hover:bg-[#574cd0] text-white text-base font-semibold mb-4 rounded-lg"
+                        disabled={loading}
                       >
-                        Signup with Mail
-                        <i className="bx bx-envelope text-2xl"></i>
+                        {loading ? "Signing Up..." : "Sign Up"}
                       </button>
-                    </Form>
-                    <button
+                    </form>
+
+                    <div className="w-60 h-5 border-b-2 rounded-md border-[#484848]"></div>
+                    {/* <button
                       onClick={signupWithGoogle}
-                      className="w-72 h-11 text-white flex justify-center items-center gap-x-2 shadow-md hover:bg-white/30 font-semibold py-2 rounded mb-1"
+                      className="w-full h-11 flex items-center justify-center bg-[#242526] border border-[#696969] text-[#696969] text-base font-semibold py-2 gap-2 px-4 rounded-lg"
                     >
-                      Signup with Google
-                      <i className="bx bxl-google text-2xl"></i>
-                    </button>
+                      Sign Up with Google
+                      <img src={Google} alt="Google Logo" className="h-6" />
+                    </button> */}
                   </div>
                 ) : (
-                  <Form
-                    onFinish={signin}
-                    className="pt-10 w-full h-full flex flex-col justify-center -mt-10 userForm"
-                  >
-                    <Form.Item
-                      name="username"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input your Username!",
-                        },
-                      ]}
+                  <div className="flex flex-col justify-center items-center gap-6 h-full">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        signin({ username: email, password: password });
+                      }}
+                      className="pt-10 w-72"
                     >
-                      <Input
-                        className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
-                        placeholder="Username"
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      name="password"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input your Password!",
-                        },
-                      ]}
-                    >
-                      <Input
-                        type="password"
-                        className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
-                        placeholder="Password"
-                      />
-                    </Form.Item>
-                    <button className="w-full h-11 bg-[#695CFE] hover:bg-[#574cd0] active:bg-[#574cd0] active:scale-95 duration-150 text-white font- py-2 px-4 mb-4 rounded-lg font-semibold text-base">
-                      Login
-                    </button>
-                  </Form>
-                )}
-                {param.signup === "signin" && (
-                  <Link
-                    to={"/signup"}
-                    className="text-blue-200 hover:text-blue-400 userForm"
-                  >
-                    Don't have an account?{" "}
-                  </Link>
+                      <div className="mb-4">
+                        <input
+                          onChange={(e) => setEmail(e.target.value)}
+                          type="text"
+                          name="username"
+                          required
+                          className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
+                          placeholder="Username/Email"
+                        />
+                      </div>
+                      <div className="mb-4 relative">
+                        <input
+                          onChange={(e) => setPassword(e.target.value)}
+                          type={showPassword ? "text" : "password"} // Toggle between text and password
+                          name="password"
+                          required
+                          className="bg-transparent text-white h-12 text-lg placeholder:text-gray-400 w-full mt-2 p-2 rounded-md"
+                          placeholder="Password"
+                        />
+                        <div className="flex items-center mt-2">
+                          <input
+                            type="checkbox"
+                            id="showPassword"
+                            checked={showPassword}
+                            onChange={() => setShowPassword(!showPassword)}
+                            className="mr-2 bg-transparent cursor-pointer"
+                          />
+                          <label htmlFor="showPassword" className="text-gray-400">
+                            Show Password
+                          </label>
+                        </div>
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full h-11 flex items-center justify-center bg-[#695CFE] hover:bg-[#574cd0] text-white text-base font-semibold mb-4 rounded-lg"
+                        disabled={loading}
+                      >
+                        {loading ? "Signing In..." : "Sign In"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="w-full text-[#c7c7c7] hover:text-white mb-4 text-sm"
+                      >
+                        Forgot Password?
+                      </button>
+                    </form>
+                    <div className="w-60 h-5 border-b-2 rounded-md border-[#484848]"></div>
+                    <Link to="/signup" className="text-[#c7c7c7] hover:text-white">
+                      Don't have an account? Sign Up
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-          {loading && <Loader />}
         </div>
       )}
+
+      {/* OTP Popup for Signup */}
+      <OTPPopup
+        visible={otpSent}
+        onClose={() => setOtpSent(false)}
+        otpValue={otpValue}
+        setOtpValue={setOtpValue}
+        onVerify={verifyOtp}
+      />
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal 
+        visible={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+      />
     </div>
   );
 };

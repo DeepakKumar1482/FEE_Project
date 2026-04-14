@@ -1,5 +1,6 @@
+import { loadSlim } from '@tsparticles/slim';
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import {useNavigate, NavLink, Link} from "react-router-dom"
+import {useNavigate, NavLink, Link, useLocation} from "react-router-dom"
 // import {Button} from '../index'
 
 function SideBar() {
@@ -25,7 +26,7 @@ function SideBar() {
       icon: 'bookmark'
     }, 
     {
-      name: 'Add Post',
+      name: 'Post',
       slug: 'add-post',
       icon: 'plus-circle'
     }, 
@@ -35,20 +36,28 @@ function SideBar() {
       icon: 'bell'
     }, 
   ];
+  // console.log("top : ", location.pathname);
+  const location = useLocation();
 
   function handleSize() {
     if(window.innerWidth <= 1024){
-      console.log("running");
       return false;
     }
-    else{
-      return true;
-    }
+    else if(location.pathname != "/messages" && window.innerWidth > 1024) return true;
   }
-  const [open, setOpen] = useState(handleSize);
+  const [open, setOpen] = useState(() => handleSize());
   const [themeMode, setThemeMode] = useState();
   const themeIcon =  useRef(null);
   const themeLabel = useRef(null);
+
+  useEffect(() => {
+    if(location.pathname == "/messages" ){
+      setOpen(false);
+    }
+    else if(location.pathname != "/messages" && window.innerWidth > 1024){
+      setOpen(true);
+    }
+  },[location])
 
   useEffect(() => {
     const theme = localStorage.getItem('themeMode');
@@ -67,12 +76,12 @@ function SideBar() {
     document.querySelector('html').classList.add(themeMode);
     
     setTimeout(() => {
-        themeIcon.current.classList.remove('bx-moon', 'bx-sun');
-        themeMode == 'dark' ? themeIcon.current.classList.add('bx-sun') : themeIcon.current.classList.add('bx-moon');
-        themeIcon.current.classList.remove('scale-0');
-        themeIcon.current.classList.add('rotate-[360deg]','scale-1');
+        themeIcon.current?.classList.remove('bx-moon', 'bx-sun');
+        themeMode == 'dark' ? themeIcon.current?.classList.add('bx-sun') : themeIcon.current?.classList.add('bx-moon');
+        themeIcon.current?.classList.remove('scale-0');
+        themeIcon.current?.classList.add('rotate-[360deg]','scale-1');
       },600)
-      themeIcon.current.classList.remove('rotate-[360deg]');
+      themeIcon.current?.classList.remove('rotate-[360deg]');
 
   } , [themeMode]);
 
@@ -102,26 +111,44 @@ function SideBar() {
   //     }
   //   });
   // })
-  window.addEventListener('resize', function handleChange(){
-    if(window.innerWidth <= 1024){
-      setOpen(false);
-    }
-    else{
-      setOpen(true);
-    }
-  });
+  useEffect(() => {
+    window.addEventListener('resize', function handleChange(){
+      console.log("location : ", location.pathname + " open : " + open);
+  
+      if(window.innerWidth <= 1024){
+        setOpen(false);
+      }
+      else if(location.pathname == "/messages") setOpen(false);
+      else if(location.pathname !== "/messages") setOpen(true);
+  
+      }
+    );
+  },[])
+  const username=localStorage.getItem("username");
+  // window.addEventListener('resize', function handleChange(){
+  //   console.log("location : ", location.pathname + " open : " + open);
 
+  //   if(window.innerWidth <= 1024){
+  //     setOpen(false);
+  //   }
+  //   else if(location.pathname == "/messages") setOpen(false);
+  //   else if(location.pathname !== "/messages") setOpen(true);
+
+  //   }
+  // );
+  // [#242526]
   return (
-    <div className={`sticky left-0 top-0 ${open ? "w-64" : "w-16"} duration-300 h-screen dark:bg-[#242526] bg-white dark:border-[#3A3B3C] border-r-[1px]`}>
+    <div className={`sticky left-0 top-0 ${open ? "w-64" : "w-16"} duration-300 h-screen dark:bg-black bg-white dark:border-[#3A3B3C] border-r-[1px]`}>
       <div className="flex items-center py-5 ">
         <Link 
           to="/"
+          onClick={() => window.location.reload()}
           className='flex text-[#695CFE] cursor-pointer flex-row items-center h-12 dark:hover:text-gray-300 hover:text-gray-800 mb-2'>
         <div className='flex justify-start items-center'>
           <span className="inline-flex items-center justify-center h-12 w-12 text-5xl ml-2"><i className={`bx bx-user`}></i></span>
           <div className={`flex flex-col justify-center ml-1 ${open ? "block" : "hidden"} duration-300`}>
-            <p className='text-2xl font-[550] '>CODEBUDDY</p>
-            <p className='text-gray-800 font-medium text-xs ml-[2px] dark:text-white'>Coding Together Now</p>
+            <p className='text-2xl font-semibold'>CODEBUDDY</p>
+            <p className='text-gray-800 font-medium text-sm ml-[2px] dark:text-white'>Coding Together Now</p>
           </div>
         </div>
         </Link>
@@ -133,13 +160,16 @@ function SideBar() {
             <li key={item.name}>
               <Link 
               to={item.slug}
+              onClick={() => {
+                item.name == "Home" && location.pathname == "/" && window.location.reload()
+              }}
               className='flex cursor-pointer flex-row items-center h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] transition-bg-color justify-between'
               >
                 <div className='flex justify-start items-center w-fit'>
-                  <span className="inline-flex relative items-center justify-center h-12 w-12 mr-1 text-2xl"><i className={`bx bx-${item.icon}`}>{((item.name == "Notifications" || item.name == "Messages") && !open) ? <div className='w-2 h-2 bg-red-500 rounded absolute top-2'></div> : null}</i></span>
-                  <span className={`text-base font-[550] ${open ? "block" : "hidden"} duration-300`}>{item.name}</span>
+                  <span className="inline-flex relative items-center justify-center h-12 w-12 mr-1 text-2xl"><i className={`bx bx-${item.icon}`}>{((item.name == "Notificat" || item.name == "Messa") && !open) ? <div className='w-2 h-2 bg-red-500 rounded absolute top-2'></div> : null}</i></span>
+                  <span className={`text-base font-[550] overflow-hidden ${open ? "block scale-100" : "hidden scale-0"} duration-300`}>{item.name}</span>
                 </div>
-                <span className={`${((item.name == "Notifications" || item.name == "Messages") && open) ? "" : "scale-0"} mr-6 text-sm bg-red-100 rounded-full ml-2 px-3 py-px text-red-500`}>5</span>
+                <span className={`${((item.name == "Notificati" || item.name == "Messa") && open) ? "" : "scale-0"} mr-6 text-sm bg-red-100 rounded-full ml-2 px-3 py-px text-red-500`}>5</span>
                 {/* {((item.name == "Notifications" || item.name == "Messages") && open) ? <span className="mr-6 text-sm bg-red-100 rounded-full float-right px-3 py-px text-red-500">5</span> : null} */}
               </Link>
             </li>
@@ -166,7 +196,7 @@ function SideBar() {
                   ref={themeIcon}
                   className='bx bx-moon text-2xl duration-500'></i>
                   <span className={`text-base font-[550] ml-4 ${open ? "block" : "hidden"} duration-300`}>
-                  {themeMode == "dark"? "Light Mode" : "Dark Mode"}</span>
+                  {themeMode == "dark"? "Appearance" : "Appearance"}</span>
                 </div>
               </div>
             </label>
@@ -174,7 +204,7 @@ function SideBar() {
         </ul>
         <div className='absolute bottom-2 w-full px-2'>
           <NavLink 
-          to='/'
+          to={`/userprofile/${username}`}
           className={({isActive}) => 
           `flex flex-row items-center  h-12 duration-200 text-gray-800 dark:text-white dark:hover:text-gray-300 mb-3 hover:scale-105 hover:bg-[#695CFE] hover:text-white rounded-lg dark:hover:bg-[#3A3B3C] ${isActive? "text-gray-500" : "text-gray-800"}`}
           >

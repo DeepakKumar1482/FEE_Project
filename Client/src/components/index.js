@@ -4,7 +4,6 @@ import PostCard from "./PostCard";
 import ModalPost from "./ModalPost";
 import Footer from "./Footer/Footer";
 import LikesModalComp from "./LikesModalComp";
-import ImageCarousel from "./ImageCarousel";
 import FullPreview from "./FullPreview";
 import ParticlesComponent from "./ParticlesComponent";
 
@@ -15,7 +14,6 @@ export{
     ModalPost,
     Footer,
     LikesModalComp,
-    ImageCarousel,
     FullPreview,
     ParticlesComponent
 }

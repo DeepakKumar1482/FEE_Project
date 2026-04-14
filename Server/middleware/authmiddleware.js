@@ -1,22 +1,71 @@
 const jwt = require('jsonwebtoken');
-const authmiddleware = (req, res, next) => {
+const ProfileModel = require('../schema/userProfileSchema');
+// const authmiddleware = (req, res, next) => {
+//     try {
+//         const token = req.headers['authorization'].split(" ")[1];
+//         const secretKey = "DeepakKumar1482";
+//         jwt.verify(token, secretKey, (err, decoded) => {
+//             if (err) {
+//                 res.status(401).json({
+//                     success: false,
+//                     message: "Authentication failed"
+//                 })
+//             } else {
+//                 req.userName = decoded.id;
+//                 next();
+//             }
+//         })
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).json({
+//             success: false,
+//             message: "Internal Server Error"
+//         })
+//     }
+// }
+
+const authmiddleware = async(req, res, next) => {
     try {
-        const token = req.headers['authorization'].split(" ")[1];
-        const secretKey = "DeepakKumar1482";
-        jwt.verify(token, secretKey, (err, decoded) => {
-            if (err) {
-                res.status(401).json({
-                    success: false,
-                    message: "Authentication failed"
-                })
-            } else {
-                req.userName = decoded.id;
-                next();
+        const token = req.headers['authorization']?.split(" ")[1];
+        if(!token){
+            const error = new Error("Unauthorized access");
+            error.statusCode = 400;
+            throw error;
+        }
+    
+        const decodedToken = jwt.verify(token, process.env.secretKey);
+        let isEmail=false;
+        // const username=req.body.username;
+
+        // console.log(username, password);
+        for(let i=0;i<decodedToken.id.length;i++){
+            if(decodedToken.id[i]==='@'){
+                isEmail=true;
+                break;
             }
-        })
+        }
+        let user;
+        if(isEmail){
+            console.log("inside is email");
+         user= await ProfileModel.findOne({email: decodedToken.id});
+        }else{
+            console.log("inside username");
+        user = await ProfileModel.findOne({username: decodedToken.id});
+    }
+    console.log(user);
+        if(!user){
+            const error = new Error("Invalid token");
+            error.statusCode = 400;
+            throw error;
+        }
+        
+        req.user = user;
+        req.userName = user.username;
+        next();
     } catch (err) {
-        console.log(err);
-        res.status(500).json({
+        const error = new Error(err?.message || "Middleware Error");
+        error.statusCode = 500;
+        return res.status(500).json({
             success: false,
             message: "Internal Server Error"
         })

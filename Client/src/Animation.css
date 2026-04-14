@@ -8,49 +8,49 @@
 #logo path:nth-child(1){
     stroke-dasharray: 200px;
     stroke-dashoffset: 200px;
-    animation: anim-line 2s ease forwards ;
+    animation: anim-line 1.5s ease forwards ;
 }
 #logo path:nth-child(2){
     stroke-dasharray: 200px;
     stroke-dashoffset: 200px;
-    animation: anim-line 2s ease forwards 0.3s;
+    animation: anim-line 1.5s ease forwards 0.3s;
 }   
 #logo path:nth-child(3){
     stroke-dasharray: 200px;
     stroke-dashoffset: 200px;
-    animation: anim-line 2s ease forwards 0.6s;
+    animation: anim-line 1.5s ease forwards 0.6s;
 
 }
 #logo path:nth-child(4){
     stroke-dasharray: 200px;
     stroke-dashoffset: 200px;
-    animation: anim-line 2s ease forwards 0.9s;
+    animation: anim-line 1.5s ease forwards 0.9s;
 }
 #logo path:nth-child(5){
     stroke-dasharray: 200px;
     stroke-dashoffset: 200px;
-    animation: anim-line 2s ease forwards 1.2s;
+    animation: anim-line 1.5s ease forwards 1.2s;
 }
 #logo path:nth-child(6){
     stroke-dasharray: 200px;
     stroke-dashoffset: 200px;
-    animation: anim-line 2s ease forwards 1.5s;
+    animation: anim-line 1.5s ease forwards 1.5s;
 }
 #logo path:nth-child(7){
     stroke-dasharray: 200px;
     stroke-dashoffset: 200px;
-    animation: anim-line 2s ease forwards 1.8s;
+    animation: anim-line 1.5s ease forwards 1.8s;
 
 }
 #logo path:nth-child(8){
     stroke-dasharray: 200px;
     stroke-dashoffset: 200px;
-    animation: anim-line 2s ease forwards 2.1s;
+    animation: anim-line 1.5s ease forwards 2.1s;
 }
 #logo path:nth-child(9){
     stroke-dasharray: 200px;
     stroke-dashoffset: 200px;
-    animation: anim-line 2s ease forwards 2.4s;
+    animation: anim-line 1.5s ease forwards 2.4s;
 }
 
 #loginbox > * {

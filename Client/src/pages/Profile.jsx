@@ -9,17 +9,24 @@ const { Option } = Select;
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader/loader";
 import { ParticlesComponent } from "../components";
+import { useUser } from "../ContextApi/UserContext";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 const Profile = () => {
   const navigate = useNavigate();
-  const [selectedimage, setSelectedImage] = useState(null);
-  const [imageurl, setImageUrl] = useState("");
-  const [githubName, setGithubName] = useState(null);
+  // const [imageurl, setImageUrl] = useState("");
+  const [githubid, setGithubName] = useState(null);
   const [userName, setUserName] = useState(null);
-  const [isUserExist, setIsUserExist] = useState(0);
-  const [val, setval] = useState({});
-  const [temp, settemp] = useState(0);
-  const [flag, setflag] = useState(0);
+  // const [isUserExist, setIsUserExist] = useState(0);
+  // const [val, setval] = useState({});
+  // const [temp, settemp] = useState(0);
+  // const [flag, setflag] = useState(0);
+  const { userData } = useUser();
+  const { email, password } = userData;
+  console.log("this is email -> ", email);
+  console.log("This is password -> ", password);
   const [loading, setloading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
   const universities = [
     "IIT Bombay",
     "IIT Delhi",
@@ -99,39 +106,12 @@ const Profile = () => {
     "Kubernetes",
   ];
   techStack.sort();
-  useEffect(() => {
-    if (temp > 0) {
-      formData(val);
-    }
-    settemp(() => temp + 1);
-  }, [imageurl]);
-  const handleFileChange = (event) => {
-    setSelectedImage(event.target.files[0]);
-  };
-
-  const cloudinaryUpload = async () => {
-    setloading(true);
-    const data = new FormData();
-    data.append("file", selectedimage);
-    data.append("upload_preset", "codebuddy");
-    data.append("cloud_name", "dhrahulpp");
-    await axios
-      .post("https://api.cloudinary.com/v1_1/dhrahulpp/image/upload", data)
-      .then((response) => {
-        const url = response.data.secure_url;
-        setImageUrl(url);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   const provider = new GithubAuthProvider();
   const auth = getAuth(app);
 
   const githubAuthentication = async (e) => {
     e.preventDefault(); // Prevent form submission
-    if (githubName == null) {
+    if (githubid == null) {
       await signInWithPopup(auth, provider)
         .then((result) => {
           const credential = GithubAuthProvider.credentialFromResult(result);
@@ -148,83 +128,146 @@ const Profile = () => {
     }
   };
 
-  const formData = async (values) => {
-    try {
-      const res = await axios.post(
-        "http://localhost:8080/api/user/createuser",
-        { githubName, imageurl, ...values }
-      );
-      if (res.data.success) {
-        localStorage.setItem("token", res.data.token);
-        message.success(res.data.message);
-        navigate("/");
-      } else {
-        message.error(res.data.message);
-      }
-      setloading(false);
-    } catch (e) {
-      console.log(e);
-    }
+  const handleFileChange = (event) => {
+    setSelectedImage(event.target.files[0]);
   };
+  var formData = new FormData();
+  formData.append("image", selectedImage);
+  // formData.append("githubName", githubName);
+  function validateName(name) {
+    const nameRegex = /^[a-zA-Z]+(?:[ '-][a-zA-Z]+)*$/;
 
-  const UserExist = async (username) => {
-    try {
-      const res = await axios.post(
-        "http://localhost:8080/api/user/isUserExist",
-        { user: username }
+    if (!name || name.length < 1 || name.length > 50) {
+      message.info("Error: Name must be between 1 and 50 characters.");
+      return false;
+    }
+
+    if (!nameRegex.test(name)) {
+      message.info("Error: Name contains invalid characters or formatting.");
+      return false;
+    }
+
+    // message.info("Valid name.");
+    return true;
+  }
+
+  function validateUsername(username) {
+    const usernameRegex = /^(?!.*[._]{2})[a-zA-Z0-9._]{3,30}$/;
+
+    if (!username || username.length < 3 || username.length > 30) {
+      message.info("Error: Username must be between 3 and 30 characters.");
+      return false;
+    }
+
+    if (!usernameRegex.test(username)) {
+      message.info(
+        "Error: Username contains invalid characters or formatting."
       );
-      if (res.data.success === false) {
-        message.error("Username already taken");
-        setIsUserExist(0);
-      } else {
-        setIsUserExist(res.data.data);
-        console.log(res.data.data);
-      }
-    } catch (err) {
-      console.log(err);
+      return false;
     }
-  };
-  useEffect(() => {
-    if (flag > 0 && isUserExist != 0) {
-      if (githubName == null) {
-        message.error("Please Sign in with Github");
-        return;
-      }
-      if (selectedimage != null) {
-        cloudinaryUpload();
-      } else {
-        message.error("Please upload image");
-        return;
-      }
+
+    if (
+      username.startsWith(".") ||
+      username.startsWith("_") ||
+      username.endsWith(".") ||
+      username.endsWith("_")
+    ) {
+      message.info("Error: Username cannot start or end with '.' or '_'.");
+      return false;
     }
-    setflag(() => flag + 1);
-  }, [isUserExist]);
-  const callBoth = async (values) => {
-    await UserExist(userName);
-    if (isUserExist == true) {
+
+    // message.info("Valid username.");
+    return true;
+  }
+
+  const uploaduser = async (values, e) => {
+    // if(!userData.token){
+    //   message.error("Please Register first");
+    //   return;
+    // }
+    const nameCheck = validateName(values.name);
+    if (!nameCheck) {
       return;
     }
-    setval(values);
+    const usernameCheck = validateUsername(values.username);
+    if (!usernameCheck) {
+      return;
+    }
+    if (!selectedImage) {
+      message.info("Please select an image");
+      return;
+    }
+    if (!values.university) {
+      message.info("Please select a university");
+      return;
+    }
+    if (!values.techStack) {
+      message.info("Please select a techStack");
+      return;
+    }
+    if (!githubid) {
+      message.info("Please authenticate with github");
+      return;
+    }
+    formData.append("name", values.name);
+    formData.append("username", values.username);
+    formData.append("password", password);
+    formData.append("email", email);
+    formData.append("techStack", values.techStack);
+    formData.append("githubid", githubid);
+    formData.append("university", values.university);
+    formData.append("Email", email);
+    formData.append("Password", password);
+    console.log("This is Form data -> ", formData);
+    // name, username, password, university, techStack
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/api/user/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (res.data.success) {
+        localStorage.setItem("token", userData.token);
+        localStorage.setItem("username", values.username);
+        console.log(res.data.token);
+        message.success("Saved");
+        navigate("/");
+      } else {
+        formData = new FormData();
+        message.error(res.data.message);
+      }
+    } catch (e) {
+      formData = new FormData();
+      console.log(e);
+    }
+    e.preventDefault();
   };
+  console.log("userdata: ", userData.token);
   return (
     <div>
       <ParticlesComponent />
       <div className="h-screen w-screen flex justify-center items-center">
-        <div className="flex w-full h-full justify-center items-center pr-8">
-          <iframe
-            className="z-10 w-1/2 h-full"
-            src="https://lottie.host/embed/66a1ffad-f057-495a-a0eb-2d1baf3fb430/lF5aT9FYcp.json"
-          ></iframe>
+        <div className="flex w-full h-full justify-evenly items-center pr-8">
+          <DotLottieReact
+            className="w-[50rem] h-[40rem] z-10"
+            src="https://lottie.host/75c0a6cb-1e06-43dd-9038-c3a263ab380b/HN8Gmvd2Sp.json"
+            loop
+            autoplay
+          />
           <div className="h-fit w-[38rem] z-10 rounded-md flex flex-col backdrop-blur-sm bg-black/30 items-center justify-center mx-2 gap-6 border-[1px] py-6">
             <div className="w-full flex justify-center items-end">
               <label
                 htmlFor="file-input"
                 className="h-20 w-20 flex items-center justify-center"
               >
-                {selectedimage ? (
+                {selectedImage ? (
                   <img
                     className="h-full z-10 w-full object-cover rounded-full hover:cursor-pointer"
-                    src={URL.createObjectURL(selectedimage)}
+                    src={URL.createObjectURL(selectedImage)}
                     alt="Selected Image"
                   />
                 ) : (
@@ -234,6 +277,7 @@ const Profile = () => {
                 )}
               </label>
               <input
+                name="image"
                 id="file-input"
                 type="file"
                 onChange={handleFileChange}
@@ -242,7 +286,7 @@ const Profile = () => {
             </div>
             <div className="w-full flex justify-center">
               <Form
-                onFinish={callBoth}
+                onFinish={uploaduser}
                 className="rounded-md w-full flex flex-col px-10 justify-center"
               >
                 <Form.Item name="name" className="">
@@ -258,13 +302,13 @@ const Profile = () => {
                     placeholder="Username"
                   />
                 </Form.Item>
-                <Form.Item name="password" className="">
+                {/* <Form.Item name="password" className="">
                   <Input
                     className="bg-transparent focus:bg-transparent hover:bg-transparent text-white h-12 text-lg placeholder:text-gray-400 placeholder:text-base rounded-lg"
                     type="password"
                     placeholder="Password"
                   />
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item name="university" className="">
                   <Select
                     mode="single"
