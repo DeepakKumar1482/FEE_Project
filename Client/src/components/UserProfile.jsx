@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {message} from "antd";
 import PostCard from './PostCard.jsx'
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Loader from "./Loader/loader.jsx";
 import Saved from "../pages/Saved.jsx";
 import ModalPost from "./ModalPost.jsx";
 const UserProfile = () => {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState(null); // Start with `null` to handle loading state
   const [currUser, setCurrUser] = useState(localStorage.getItem("username")); // Retrieve `username` from localStorage
   const [techStack, setTechStack] = useState("");
@@ -212,7 +213,7 @@ const UserProfile = () => {
               </div>
               {/* Action Buttons */}
               <div className="flex space-x-4 mt-6">
-                <button className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">
+                <button onClick={() => navigate('/messages')} className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">
                   Message
                 </button>
                 <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600" onClick={AddConnection}>

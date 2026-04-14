@@ -147,8 +147,8 @@ function SideBar() {
         <div className='flex justify-start items-center'>
           <span className="inline-flex items-center justify-center h-12 w-12 text-5xl ml-2"><i className={`bx bx-user`}></i></span>
           <div className={`flex flex-col justify-center ml-1 ${open ? "block" : "hidden"} duration-300`}>
-            <p className='text-2xl font-[550] '>CODEBUDDY</p>
-            <p className='text-gray-800 font-medium text-xs ml-[2px] dark:text-white'>Coding Together Now</p>
+            <p className='text-2xl font-semibold'>CODEBUDDY</p>
+            <p className='text-gray-800 font-medium text-sm ml-[2px] dark:text-white'>Coding Together Now</p>
           </div>
         </div>
         </Link>
